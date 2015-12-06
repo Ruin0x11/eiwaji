@@ -3,6 +3,7 @@ require 'bundler/setup'
 
 require 'Qt'
 require_relative 'mainwindow'
+require_relative 'ui/ui_main_window'
 
 module Eiwaji
   class EiwajiApp
