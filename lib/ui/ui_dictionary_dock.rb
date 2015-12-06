@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'dictionary_dock.ui'
 **
-** Created: 日 12月 6 15:27:24 2015
+** Created: 日 12月 6 16:06:39 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -16,7 +16,7 @@ class Ui_DictionaryWidget
     attr_reader :dockWidget
     attr_reader :dockWidgetContents_2
     attr_reader :verticalLayout_3
-    attr_reader :textBrowser
+    attr_reader :wordDetails
 
     def setupUi(dictionaryWidget)
     if dictionaryWidget.objectName.nil?
@@ -39,6 +39,7 @@ class Ui_DictionaryWidget
     @verticalLayout.objectName = "verticalLayout"
     @searchResults = Qt::TableView.new(@dockWidgetContents)
     @searchResults.objectName = "searchResults"
+    @searchResults.minimumSize = Qt::Size.new(300, 200)
     @searchResults.autoScroll = false
     @searchResults.selectionMode = Qt::AbstractItemView::SingleSelection
     @searchResults.selectionBehavior = Qt::AbstractItemView::SelectRows
@@ -55,10 +56,10 @@ class Ui_DictionaryWidget
     @verticalLayout_3 = Qt::VBoxLayout.new(@dockWidgetContents_2)
     @verticalLayout_3.objectName = "verticalLayout_3"
     @verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-    @textBrowser = Qt::TextBrowser.new(@dockWidgetContents_2)
-    @textBrowser.objectName = "textBrowser"
+    @wordDetails = Qt::TextBrowser.new(@dockWidgetContents_2)
+    @wordDetails.objectName = "wordDetails"
 
-    @verticalLayout_3.addWidget(@textBrowser)
+    @verticalLayout_3.addWidget(@wordDetails)
 
     @dockWidget.setWidget(@dockWidgetContents_2)
 

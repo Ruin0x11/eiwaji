@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'lexer.ui'
 **
-** Created: 日 12月 6 15:36:08 2015
+** Created: 日 12月 6 15:55:17 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -18,6 +18,7 @@ class Ui_LexerWidget
         lexerWidget.objectName = "lexerWidget"
     end
     lexerWidget.resize(400, 300)
+    lexerWidget.minimumSize = Qt::Size.new(100, 100)
     lexerWidget.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
     lexerWidget.allowedAreas = Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
     @dockWidgetContents = Qt::Widget.new(lexerWidget)
@@ -29,6 +30,7 @@ class Ui_LexerWidget
     @verticalLayout.objectName = "verticalLayout"
     @lexerTextBrowser = Qt::TextBrowser.new(@dockWidgetContents)
     @lexerTextBrowser.objectName = "lexerTextBrowser"
+    @lexerTextBrowser.minimumSize = Qt::Size.new(300, 300)
     @font = Qt::Font.new
     @font.pointSize = 18
     @lexerTextBrowser.font = @font

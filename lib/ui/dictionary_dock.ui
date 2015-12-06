@@ -28,6 +28,12 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QTableView" name="searchResults">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>200</height>
+         </size>
+        </property>
         <property name="autoScroll">
          <bool>false</bool>
         </property>
@@ -59,7 +65,7 @@
         <widget class="QWidget" name="dockWidgetContents_2">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QTextBrowser" name="textBrowser"/>
+           <widget class="QTextBrowser" name="wordDetails"/>
           </item>
          </layout>
         </widget>

@@ -33,8 +33,16 @@ module Eiwaji
       @ui.searchResults.sortByColumn(index)
     end
 
-    def getWordDetails(model)
-      puts "dood"
+    def getWordDetails(index)
+      row = index.row
+
+      resultIndex = @ui.searchResults.model.index(row, 0)
+      kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
+      resultIndex = @ui.searchResults.model.index(row, 1)
+      kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
+      resultIndex = @ui.searchResults.model.index(row, 2)
+      sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
+      @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense)
     end
 
     def search(query, lemma = nil)
@@ -71,7 +79,7 @@ module Eiwaji
           model.setData(index, Qt::Variant.new(kanji))
         end
 
-        kana = entry.kana[0].force_encoding("UTF-8")
+        kana = entry.kana.map {|k| k.force_encoding("UTF-8") }.join(', ')
         index = model.index(row, 1, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(kana))
 

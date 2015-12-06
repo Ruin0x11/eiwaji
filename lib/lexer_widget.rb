@@ -26,6 +26,24 @@ module Eiwaji
       @ui.textBrowser
     end
 
+    def event(event)
+      if event.type == Qt::Event::ToolTip
+        cursor = @ui.lexerTextBrowser.cursorForPosition(event.pos)
+        cursor.select(Qt::TextCursor::WordUnderCursor)
+        fragment = cursor.selection()
+
+        hrefRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"/
+        resultsIndex = hrefRegex.match(fragment.toHtml)
+        if not resultsIndex or resultsIndex.size != 2
+          Qt::ToolTip.hideText
+        else
+          word = @lexerResults[resultsIndex[1].to_i]
+          Qt::ToolTip.showText(event.globalPos(), word.word + " " + word.part_of_speech.name)
+        end
+      end
+      super(event)
+    end
+
     def lexText(text)
       text = text.force_encoding("UTF-8")
 
