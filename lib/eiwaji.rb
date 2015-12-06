@@ -1,5 +1,8 @@
+require 'rubygems'
+require 'bundler/setup'
+
 require 'Qt'
-require 'mainwindow'
+require_relative 'mainwindow'
 
 module Eiwaji
   class EiwajiApp

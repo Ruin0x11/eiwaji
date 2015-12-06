@@ -1,4 +1,5 @@
 # coding: utf-8
+require 'jdict'
 require 'jmdict'
 require 've'
 require 'pp'
@@ -16,29 +17,24 @@ module Eiwaji
     def initialize(parent = nil)
       super(parent)
 
+      JDict.configure do |config|
+        config.dictionary_path = '/home/ruin'
+        config.index_path = '/home/ruin/build/index_eiwaji'
+        config.lazy_index_loading = false
+      end
+
       part_of_speech_colors()
 
       @bigEdit = Qt::TextEdit.new
-      @dictQuery = Qt::LineEdit.new
-
-      connect(@dictQuery, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
 
       clipboard = Qt::Application.clipboard
       connect(clipboard, SIGNAL('changed(QClipboard::Mode)'), self, SLOT('clipboardChanged(QClipboard::Mode)'))
-      
-      layout = Qt::VBoxLayout.new do |m|
-        m.addWidget(@dictQuery)
-        m.addWidget(@bigEdit)
-      end
-      
-      @window = Qt::Widget.new
-      @window.setLayout(layout)
 
       @white = Text::WhiteSimilarity.new
 
-      @dict = JDict::JMDict.new(INDEX_PATH, false)
+      @dict = JDict::JMDict.new()
 
-      setCentralWidget(@window)
+      setCentralWidget(@bigEdit)
 
       createActions()
       createMenus()
@@ -123,6 +119,7 @@ module Eiwaji
       pp word
       query = word.tokens[0][:lemma]
       lemma = word.lemma
+      @dictQuery.setText(query)
       search(query, lemma)
     end
 
@@ -212,7 +209,7 @@ module Eiwaji
 
     def createDockWindows()
       dock = Qt::DockWidget.new(tr("Lexer"), self)
-      dock.allowedAreas = Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea
+      dock.allowedAreas = Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea
 
       @lexerView = Qt::TextBrowser.new
 
@@ -243,9 +240,20 @@ module Eiwaji
       @entryResults.setFont(font)
       @entryResults.setSelectionMode(Qt::AbstractItemView::NoSelection)
       connect(@entryResults, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+
+      @dictQuery = Qt::LineEdit.new
+      connect(@dictQuery, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
+
+      layout = Qt::VBoxLayout.new do |m|
+        m.addWidget(@dictQuery)
+        m.addWidget(@entryResults)
+      end
+
+      @dictView = Qt::Widget.new
+      @dictView.setLayout(layout)
       
-      dock = Qt::DockWidget.new(tr("Results"), self)
-      dock.widget = @entryResults
+      dock = Qt::DockWidget.new(tr("Dictionary"), self)
+      dock.widget = @dictView
       addDockWidget(Qt::RightDockWidgetArea, dock)
     end
 
