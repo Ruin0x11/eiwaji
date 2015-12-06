@@ -11,7 +11,7 @@ module Eiwaji
 
     POS_IGNORE = [Ve::PartOfSpeech::Symbol, Ve::PartOfSpeech::Number]
 
-    slots 'veIt()', 'wordClicked(QUrl)', 'queryEntered()', 'updateSortIndex(int)'
+    slots 'lexEditorText()', 'wordClicked(QUrl)', 'queryEntered()', 'updateSortIndex(int)', 'clipboardChanged(QClipboard::Mode)'
 
     def initialize(parent = nil)
       super(parent)
@@ -22,6 +22,9 @@ module Eiwaji
       @dictQuery = Qt::LineEdit.new
 
       connect(@dictQuery, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
+
+      clipboard = Qt::Application.clipboard
+      connect(clipboard, SIGNAL('changed(QClipboard::Mode)'), self, SLOT('clipboardChanged(QClipboard::Mode)'))
       
       layout = Qt::VBoxLayout.new do |m|
         m.addWidget(@dictQuery)
@@ -39,26 +42,30 @@ module Eiwaji
 
       createActions()
       createMenus()
+      createStatusBar()
       createDockWindows()
 
       setWindowTitle(tr("Eiwaji"))
       @bigEdit.setText("日本語（にほんご、にっぽんご）は、主に日本国内や日本人同士の間で使われている言語である。日本は法令によって「公用語」を規定していないが、法令その他の公用文は全て日本語で記述され、各種法令（裁判所法第74条、会社計算規則第57条、特許法施行規則第2条など）において日本語を用いることが定められるなど事実上の公用語となっており、学校教育の「国語」でも教えられる。")
-      veIt()
+      lexEditorText()
     end
 
-    def veIt()
-      text = @bigEdit.toPlainText()
-      p text.force_encoding("UTF-8")
+    def lexEditorText
+      text = @bigEdit.toPlainText
+      lexText(text)
+    end
+
+    def lexText(text)
+      text = text.force_encoding("UTF-8")
 
       words = Ve.in(:ja).words(text)
 
       @lexerResults = Hash.new
       words.map.with_index {|word, i| @lexerResults[i] = word }
 
-      html = words.map.with_index {|word, i| convWord(word, i)}.join(' ')
+      html = words.map.with_index {|word, i| text = convWord(word, i)}.join(' ')
 
       @lexerView.setText(html)
-      p @lexerView.toHtml
     end
 
     # def part_of_speech_colors
@@ -81,6 +88,7 @@ module Eiwaji
                                   :symbol => "#000000",
                                   :postposition => "#FF0000",
                                   :pronoun => "#008080",
+                                  :adjective => "#008000",
                                   :adverb => "#43C6DB",
                                   :conjunction => "#FFA500",
                                   :background => "#FFFFFF",
@@ -91,13 +99,20 @@ module Eiwaji
     def convWord(word, index)
       raw = word.word
       pos = word.part_of_speech
-      p pos.name.underscore.to_sym
       color = @part_of_speech_colors[pos.name.gsub(' ', '_').underscore.to_sym] || @part_of_speech_colors[:default]
       
       if POS_IGNORE.include? pos
         raw = "<font style='color: #{color}'>" + raw + "</font>"
       else
         raw = "<a href=\'#{index}\' style='color: #{color}'>" + raw + "</a>"
+      end
+    end
+
+    def clipboardChanged(mode)
+      clipboard = Qt::Application.clipboard
+      
+      if clipboard.mimeData.hasText && mode == Qt::Clipboard::Clipboard && @clipboardCaptureAct.isChecked
+        lexText(clipboard.text)
       end
     end
 
@@ -158,7 +173,7 @@ module Eiwaji
         index = model.index(row, 1, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(kana))
 
-        sense = entry.senses[0].glosses[0].force_encoding("UTF-8")
+        sense = entry.senses[0].glosses.join(", ")
         pos = entry.senses[0].parts_of_speech
         # sense = pos.join(" / ") + " " + sense unless pos.nil?
         index = model.index(row, 2, Qt::ModelIndex.new)
@@ -173,15 +188,26 @@ module Eiwaji
       @entryResults.sortByColumn(3)
     end
 
+    def createStatusBar()
+      statusBar().showMessage(tr("Ready"))
+    end
+
     def createActions()
       @veAct = Qt::Action.new(tr("LexIt"), self)
       @veAct.statusTip = tr("Lexify text")
-      connect(@veAct, SIGNAL('triggered()'), self, SLOT('veIt()'))
+      connect(@veAct, SIGNAL('triggered()'), self, SLOT('lexEditorText()'))
+
+      @clipboardCaptureAct = Qt::Action.new(tr("&Capture Clipboard"), self)
+      @clipboardCaptureAct.statusTip = tr("Send copied text to the lexer")
+      @clipboardCaptureAct.setCheckable(true)
     end
 
     def createMenus()
       @fileMenu = menuBar().addMenu(tr("&File"))
       @fileMenu.addAction(@veAct)
+
+      @editMenu = menuBar().addMenu(tr("&Edit"))
+      @editMenu.addAction(@clipboardCaptureAct)
     end
 
     def createDockWindows()
