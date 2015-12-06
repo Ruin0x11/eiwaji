@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'main_window.ui'
 **
-** Created: 日 12月 6 14:19:34 2015
+** Created: 日 12月 6 14:44:14 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -16,8 +16,6 @@ class Ui_MainWindow
     attr_reader :verticalLayout
     attr_reader :textBrowser
     attr_reader :menubar
-    attr_reader :menuFile
-    attr_reader :menuOptions
     attr_reader :statusbar
 
     def setupUi(mainWindow)
@@ -39,6 +37,7 @@ class Ui_MainWindow
     @verticalLayout.objectName = "verticalLayout"
     @textBrowser = Qt::TextBrowser.new(@centralwidget)
     @textBrowser.objectName = "textBrowser"
+    @textBrowser.readOnly = false
 
     @verticalLayout.addWidget(@textBrowser)
 
@@ -49,20 +48,10 @@ class Ui_MainWindow
     @menubar = Qt::MenuBar.new(mainWindow)
     @menubar.objectName = "menubar"
     @menubar.geometry = Qt::Rect.new(0, 0, 800, 19)
-    @menuFile = Qt::Menu.new(@menubar)
-    @menuFile.objectName = "menuFile"
-    @menuOptions = Qt::Menu.new(@menubar)
-    @menuOptions.objectName = "menuOptions"
     mainWindow.setMenuBar(@menubar)
     @statusbar = Qt::StatusBar.new(mainWindow)
     @statusbar.objectName = "statusbar"
     mainWindow.statusBar = @statusbar
-
-    @menubar.addAction(@menuFile.menuAction())
-    @menubar.addAction(@menuOptions.menuAction())
-    @menuFile.addAction(@actionAnalyse_Text)
-    @menuOptions.addAction(@actionCapture_Clipbord)
-    @menuOptions.addAction(@actionSettings)
 
     retranslateUi(mainWindow)
 
@@ -78,8 +67,6 @@ class Ui_MainWindow
     @actionAnalyse_Text.text = Qt::Application.translate("MainWindow", "Analyse Text", nil, Qt::Application::UnicodeUTF8)
     @actionCapture_Clipbord.text = Qt::Application.translate("MainWindow", "Capture Clipbord", nil, Qt::Application::UnicodeUTF8)
     @actionSettings.text = Qt::Application.translate("MainWindow", "Settings...", nil, Qt::Application::UnicodeUTF8)
-    @menuFile.title = Qt::Application.translate("MainWindow", "File", nil, Qt::Application::UnicodeUTF8)
-    @menuOptions.title = Qt::Application.translate("MainWindow", "Options", nil, Qt::Application::UnicodeUTF8)
     end # retranslateUi
 
     def retranslate_ui(mainWindow)

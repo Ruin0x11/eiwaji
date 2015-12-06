@@ -1,13 +1,13 @@
 =begin
 ** Form generated from reading ui file 'dictionary_dock.ui'
 **
-** Created: 日 12月 6 14:19:34 2015
+** Created: 日 12月 6 15:05:48 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 =end
 
-class Ui_Dictionary
+class Ui_DictionaryWidget
     attr_reader :dockWidgetContents
     attr_reader :verticalLayout_2
     attr_reader :lineEdit
@@ -18,14 +18,14 @@ class Ui_Dictionary
     attr_reader :verticalLayout_3
     attr_reader :textBrowser
 
-    def setupUi(dictionary)
-    if dictionary.objectName.nil?
-        dictionary.objectName = "dictionary"
+    def setupUi(dictionaryWidget)
+    if dictionaryWidget.objectName.nil?
+        dictionaryWidget.objectName = "dictionaryWidget"
     end
-    dictionary.resize(502, 541)
-    dictionary.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
-    dictionary.allowedAreas = Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
-    @dockWidgetContents = Qt::Widget.new(dictionary)
+    dictionaryWidget.resize(502, 541)
+    dictionaryWidget.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
+    dictionaryWidget.allowedAreas = Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
+    @dockWidgetContents = Qt::Widget.new(dictionaryWidget)
     @dockWidgetContents.objectName = "dockWidgetContents"
     @verticalLayout_2 = Qt::VBoxLayout.new(@dockWidgetContents)
     @verticalLayout_2.objectName = "verticalLayout_2"
@@ -67,30 +67,30 @@ class Ui_Dictionary
 
     @verticalLayout_2.addLayout(@verticalLayout)
 
-    dictionary.setWidget(@dockWidgetContents)
+    dictionaryWidget.setWidget(@dockWidgetContents)
 
-    retranslateUi(dictionary)
+    retranslateUi(dictionaryWidget)
 
-    Qt::MetaObject.connectSlotsByName(dictionary)
+    Qt::MetaObject.connectSlotsByName(dictionaryWidget)
     end # setupUi
 
-    def setup_ui(dictionary)
-        setupUi(dictionary)
+    def setup_ui(dictionaryWidget)
+        setupUi(dictionaryWidget)
     end
 
-    def retranslateUi(dictionary)
-    dictionary.windowTitle = Qt::Application.translate("Dictionary", "Dictionary", nil, Qt::Application::UnicodeUTF8)
-    @dockWidget.windowTitle = Qt::Application.translate("Dictionary", "Lookup", nil, Qt::Application::UnicodeUTF8)
+    def retranslateUi(dictionaryWidget)
+    dictionaryWidget.windowTitle = Qt::Application.translate("DictionaryWidget", "Dictionary", nil, Qt::Application::UnicodeUTF8)
+    @dockWidget.windowTitle = Qt::Application.translate("DictionaryWidget", "Lookup", nil, Qt::Application::UnicodeUTF8)
     end # retranslateUi
 
-    def retranslate_ui(dictionary)
-        retranslateUi(dictionary)
+    def retranslate_ui(dictionaryWidget)
+        retranslateUi(dictionaryWidget)
     end
 
 end
 
 module Ui
-    class Dictionary < Ui_Dictionary
+    class DictionaryWidget < Ui_DictionaryWidget
     end
 end  # module Ui
 
