@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'lexer.ui'
 **
-** Created: 日 12月 6 15:05:48 2015
+** Created: 日 12月 6 15:36:08 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -11,7 +11,7 @@ class Ui_LexerWidget
     attr_reader :dockWidgetContents
     attr_reader :verticalLayout_2
     attr_reader :verticalLayout
-    attr_reader :textBrowser
+    attr_reader :lexerTextBrowser
 
     def setupUi(lexerWidget)
     if lexerWidget.objectName.nil?
@@ -27,13 +27,14 @@ class Ui_LexerWidget
     @verticalLayout_2.setContentsMargins(0, 0, 0, 0)
     @verticalLayout = Qt::VBoxLayout.new()
     @verticalLayout.objectName = "verticalLayout"
-    @textBrowser = Qt::TextBrowser.new(@dockWidgetContents)
-    @textBrowser.objectName = "textBrowser"
+    @lexerTextBrowser = Qt::TextBrowser.new(@dockWidgetContents)
+    @lexerTextBrowser.objectName = "lexerTextBrowser"
     @font = Qt::Font.new
     @font.pointSize = 18
-    @textBrowser.font = @font
+    @lexerTextBrowser.font = @font
+    @lexerTextBrowser.openLinks = false
 
-    @verticalLayout.addWidget(@textBrowser)
+    @verticalLayout.addWidget(@lexerTextBrowser)
 
 
     @verticalLayout_2.addLayout(@verticalLayout)

@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'dictionary_dock.ui'
 **
-** Created: 日 12月 6 15:05:48 2015
+** Created: 日 12月 6 15:27:24 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -10,9 +10,9 @@
 class Ui_DictionaryWidget
     attr_reader :dockWidgetContents
     attr_reader :verticalLayout_2
-    attr_reader :lineEdit
+    attr_reader :searchBox
     attr_reader :verticalLayout
-    attr_reader :tableView
+    attr_reader :searchResults
     attr_reader :dockWidget
     attr_reader :dockWidgetContents_2
     attr_reader :verticalLayout_3
@@ -30,21 +30,21 @@ class Ui_DictionaryWidget
     @verticalLayout_2 = Qt::VBoxLayout.new(@dockWidgetContents)
     @verticalLayout_2.objectName = "verticalLayout_2"
     @verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-    @lineEdit = Qt::LineEdit.new(@dockWidgetContents)
-    @lineEdit.objectName = "lineEdit"
+    @searchBox = Qt::LineEdit.new(@dockWidgetContents)
+    @searchBox.objectName = "searchBox"
 
-    @verticalLayout_2.addWidget(@lineEdit)
+    @verticalLayout_2.addWidget(@searchBox)
 
     @verticalLayout = Qt::VBoxLayout.new()
     @verticalLayout.objectName = "verticalLayout"
-    @tableView = Qt::TableView.new(@dockWidgetContents)
-    @tableView.objectName = "tableView"
-    @tableView.autoScroll = false
-    @tableView.selectionMode = Qt::AbstractItemView::SingleSelection
-    @tableView.selectionBehavior = Qt::AbstractItemView::SelectRows
-    @tableView.sortingEnabled = true
+    @searchResults = Qt::TableView.new(@dockWidgetContents)
+    @searchResults.objectName = "searchResults"
+    @searchResults.autoScroll = false
+    @searchResults.selectionMode = Qt::AbstractItemView::SingleSelection
+    @searchResults.selectionBehavior = Qt::AbstractItemView::SelectRows
+    @searchResults.sortingEnabled = true
 
-    @verticalLayout.addWidget(@tableView)
+    @verticalLayout.addWidget(@searchResults)
 
     @dockWidget = Qt::DockWidget.new(@dockWidgetContents)
     @dockWidget.objectName = "dockWidget"

@@ -6,36 +6,42 @@ require_relative 'ui/ui_dictionary_dock'
 module Eiwaji
   class DictionaryWidget < Qt::DockWidget
 
-    slots 'updateSortIndex(int)', 'queryEntered()'
+    slots 'updateSortIndex(int)', 'queryEntered()', 'getWordDetails(QModelIndex)'
+    
     def initialize(parent)
       super(parent)
 
-      @ui = Ui_DictionaryWidget
+      @ui = Ui_DictionaryWidget.new
       @ui.setupUi(self)
 
       @dict = JDict::JMDict.new()
+      @white = Text::WhiteSimilarity.new
       
-      connect(@entryResults, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
-      connect(@entryResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
+      connect(@ui.searchResults, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+      connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
 
-      # @dictQuery = Qt::LineEdit.new
-      # connect(@dictQuery, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
+      connect(@ui.searchBox, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
     end
 
     def queryEntered()
-      query = @dictQuery.text
+      puts "asdf"
+      query = @ui.searchBox.text
       search(query)
     end
 
     def updateSortIndex(index)
-      @entryResults.sortByColumn(index)
+      @ui.searchResults.sortByColumn(index)
+    end
+
+    def getWordDetails(model)
+      puts "dood"
     end
 
     def search(query, lemma = nil)
       lemma ||= query
-      # else
-      #   query = word.lemma
-      # end
+
+      @ui.searchBox.setText(query)
+      
       results = @dict.search(query)
 
       model = Qt::StandardItemModel.new(results.size, 4)
@@ -43,9 +49,9 @@ module Eiwaji
       model.setHeaderData(1, Qt::Horizontal, Qt::Variant.new(tr("Kana")))
       model.setHeaderData(2, Qt::Horizontal, Qt::Variant.new(tr("Sense")))
       model.setHeaderData(3, Qt::Horizontal, Qt::Variant.new(tr("Similarity")))
-      # @entryResults.model = model
+      @ui.searchResults.model = model
 
-      # connect(@entryResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+      connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
       
       results.each_with_index do |entry, row|
         # if entry.kanji.kind_of?(Array)
@@ -81,9 +87,7 @@ module Eiwaji
         model.setData(index, Qt::Variant.new(similarity))
       end
       # sort by similarity
-      # @entryResults.sortByColumn(3)
+      updateSortIndex(3)
     end
-
-    
   end
 end

@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'main_window.ui'
 **
-** Created: 日 12月 6 14:44:14 2015
+** Created: 日 12月 6 15:32:30 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -14,7 +14,7 @@ class Ui_MainWindow
     attr_reader :centralwidget
     attr_reader :verticalLayout_2
     attr_reader :verticalLayout
-    attr_reader :textBrowser
+    attr_reader :bigEditor
     attr_reader :menubar
     attr_reader :statusbar
 
@@ -35,11 +35,11 @@ class Ui_MainWindow
     @verticalLayout_2.objectName = "verticalLayout_2"
     @verticalLayout = Qt::VBoxLayout.new()
     @verticalLayout.objectName = "verticalLayout"
-    @textBrowser = Qt::TextBrowser.new(@centralwidget)
-    @textBrowser.objectName = "textBrowser"
-    @textBrowser.readOnly = false
+    @bigEditor = Qt::TextBrowser.new(@centralwidget)
+    @bigEditor.objectName = "bigEditor"
+    @bigEditor.readOnly = false
 
-    @verticalLayout.addWidget(@textBrowser)
+    @verticalLayout.addWidget(@bigEditor)
 
 
     @verticalLayout_2.addLayout(@verticalLayout)
