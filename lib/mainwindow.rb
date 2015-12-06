@@ -2,31 +2,47 @@
 require 'jmdict'
 require 've'
 require 'pp'
+require 'text'
 
 require_relative 'tableview'
 
 module Eiwaji
   class MainWindow < Qt::MainWindow
 
-    POS_IGNORE = [Ve::PartOfSpeech::Postposition, Ve::PartOfSpeech::Symbol, Ve::PartOfSpeech::Number]
+    POS_IGNORE = [Ve::PartOfSpeech::Symbol, Ve::PartOfSpeech::Number]
 
-    slots 'veIt()', 'handleUrl(QUrl)'
+    slots 'veIt()', 'wordClicked(QUrl)', 'queryEntered()', 'updateSortIndex(int)'
 
     def initialize(parent = nil)
       super(parent)
 
+      part_of_speech_colors()
+
       @bigEdit = Qt::TextEdit.new
+      @dictQuery = Qt::LineEdit.new
+
+      connect(@dictQuery, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
+      
+      layout = Qt::VBoxLayout.new do |m|
+        m.addWidget(@dictQuery)
+        m.addWidget(@bigEdit)
+      end
+      
+      @window = Qt::Widget.new
+      @window.setLayout(layout)
+
+      @white = Text::WhiteSimilarity.new
 
       @dict = JDict::JMDict.new(INDEX_PATH, false)
 
-      setCentralWidget(@bigEdit)
+      setCentralWidget(@window)
 
       createActions()
       createMenus()
       createDockWindows()
 
-      setWindowTitle(tr("jisho"))
-      @bigEdit.setText("A340は長距離路線向けの大型機として開発され、エアバスA300由来の胴体を延長したワイドボディ機で、低翼に配置された主翼下に4発のターボファンエンジンを装備する。")
+      setWindowTitle(tr("Eiwaji"))
+      @bigEdit.setText("日本語（にほんご、にっぽんご）は、主に日本国内や日本人同士の間で使われている言語である。日本は法令によって「公用語」を規定していないが、法令その他の公用文は全て日本語で記述され、各種法令（裁判所法第74条、会社計算規則第57条、特許法施行規則第2条など）において日本語を用いることが定められるなど事実上の公用語となっており、学校教育の「国語」でも教えられる。")
       veIt()
     end
 
@@ -40,29 +56,86 @@ module Eiwaji
       words.map.with_index {|word, i| @lexerResults[i] = word }
 
       html = words.map.with_index {|word, i| convWord(word, i)}.join(' ')
-      p html
 
       @lexerView.setText(html)
+      p @lexerView.toHtml
+    end
+
+    # def part_of_speech_colors
+    #   @part_of_speech_colors ||= {
+    #                               :verb => "#B58900",
+    #                               :noun => "#93A1A1",
+    #                               :proper_noun => "#268BD2",
+    #                               :symbol => "#839496",
+    #                               :postposition => "#CB4B16",
+    #                               :pronoun => "#D33682",
+    #                               :background => "#002B36",
+    #                               :default => "#839496"
+    #                              }
+    # end
+    def part_of_speech_colors
+      @part_of_speech_colors ||= {
+                                  :verb => "#808080",
+                                  :noun => "#000000",
+                                  :proper_noun => "#0000FF",
+                                  :symbol => "#000000",
+                                  :postposition => "#FF0000",
+                                  :pronoun => "#008080",
+                                  :adverb => "#43C6DB",
+                                  :conjunction => "#FFA500",
+                                  :background => "#FFFFFF",
+                                  :default => "#FF00FF"
+                                 }
     end
 
     def convWord(word, index)
       raw = word.word
       pos = word.part_of_speech
+      p pos.name.underscore.to_sym
+      color = @part_of_speech_colors[pos.name.gsub(' ', '_').underscore.to_sym] || @part_of_speech_colors[:default]
+      
       if POS_IGNORE.include? pos
-        raw = raw
+        raw = "<font style='color: #{color}'>" + raw + "</font>"
       else
-        raw = "<a href=\'#{index}\'><b><u>" + raw + "</u></b></a>"
+        raw = "<a href=\'#{index}\' style='color: #{color}'>" + raw + "</a>"
       end
     end
 
-    def handleUrl(url)
+    def wordClicked(url)
+      raise "No results from the lexer." if @lexerResults.empty?
+
       word = @lexerResults[url.path.to_i]
-      results = @dict.search(word.lemma)
-
       pp word
+      query = word.tokens[0][:lemma]
+      lemma = word.lemma
+      search(query, lemma)
+    end
 
-      model = Qt::StandardItemModel.new(results.size, 3)
+    def queryEntered()
+      query = @dictQuery.text
+      search(query)
+    end
+
+    def updateSortIndex(index)
+      @entryResults.sortByColumn(index)
+    end
+
+    def search(query, lemma = nil)
+      lemma ||= query
+      # else
+      #   query = word.lemma
+      # end
+      results = @dict.search(query)
+
+      model = Qt::StandardItemModel.new(results.size, 4)
+      model.setHeaderData(0, Qt::Horizontal, Qt::Variant.new(tr("Kanji")))
+      model.setHeaderData(1, Qt::Horizontal, Qt::Variant.new(tr("Kana")))
+      model.setHeaderData(2, Qt::Horizontal, Qt::Variant.new(tr("Sense")))
+      model.setHeaderData(3, Qt::Horizontal, Qt::Variant.new(tr("Similarity")))
       @entryResults.model = model
+
+      connect(@entryResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+      
       results.each_with_index do |entry, row|
         # if entry.kanji.kind_of?(Array)
         #   entry.kanji.each {|kanji| p kanji.force_encoding("UTF-8")}
@@ -86,9 +159,18 @@ module Eiwaji
         model.setData(index, Qt::Variant.new(kana))
 
         sense = entry.senses[0].glosses[0].force_encoding("UTF-8")
+        pos = entry.senses[0].parts_of_speech
+        # sense = pos.join(" / ") + " " + sense unless pos.nil?
         index = model.index(row, 2, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(sense))
+
+        similarity = (@white.similarity(lemma, kana))
+        similarity += (@white.similarity(lemma, kanji)) unless kanji.nil?
+        index = model.index(row, 3, Qt::ModelIndex.new)
+        model.setData(index, Qt::Variant.new(similarity))
       end
+      # sort by similarity
+      @entryResults.sortByColumn(3)
     end
 
     def createActions()
@@ -108,21 +190,50 @@ module Eiwaji
 
       @lexerView = Qt::TextBrowser.new
 
-      font = Qt::Font.new("MS Gothic")
-      font.setPixelSize(18)
+      sheet = "a {  text-decoration: underline; color: #000000; }"
+
+      font = Qt::Font.new("Kochi Gothic")
+      font.setPixelSize(22)
+
+      color = Qt::Color.new(@part_of_speech_colors[:background])
+
       @lexerView.setFont(font)
       @lexerView.openLinks = false
+
+      palette = @lexerView.palette
+      palette.setColor(Qt::Palette::Base, color)
+      @lexerView.setPalette(palette)
+
+      @lexerView.document.setDefaultStyleSheet(sheet)
       connect(@lexerView, SIGNAL('anchorClicked(QUrl)'),
-              self, SLOT('handleUrl(QUrl)'))
+              self, SLOT('wordClicked(QUrl)'))
 
       dock.widget = @lexerView
       addDockWidget(Qt::BottomDockWidgetArea, dock)
 
+      font = Qt::Font.new("Kochi Gothic")
+      font.setPixelSize(12)
       @entryResults = Eiwaji::TableView.new
+      @entryResults.setFont(font)
+      @entryResults.setSelectionMode(Qt::AbstractItemView::NoSelection)
+      connect(@entryResults, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+      
       dock = Qt::DockWidget.new(tr("Results"), self)
       dock.widget = @entryResults
-      addDockWidget(Qt::BottomDockWidgetArea, dock)
+      addDockWidget(Qt::RightDockWidgetArea, dock)
     end
 
   end
+  module Underscore
+    def underscore
+      word = self.dup
+      word.gsub!(/::/, '/')
+      word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+      word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
+      word.tr!("-", "_")
+      word.downcase!
+      word
+    end
+  end
+  String.send(:include, Underscore)
 end
