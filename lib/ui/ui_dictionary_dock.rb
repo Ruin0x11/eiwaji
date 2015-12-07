@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'dictionary_dock.ui'
 **
-** Created: 日 12月 6 16:06:39 2015
+** Created: 日 12月 6 20:03:16 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -22,7 +22,8 @@ class Ui_DictionaryWidget
     if dictionaryWidget.objectName.nil?
         dictionaryWidget.objectName = "dictionaryWidget"
     end
-    dictionaryWidget.resize(502, 541)
+    dictionaryWidget.resize(600, 541)
+    dictionaryWidget.minimumSize = Qt::Size.new(600, 400)
     dictionaryWidget.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
     dictionaryWidget.allowedAreas = Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
     @dockWidgetContents = Qt::Widget.new(dictionaryWidget)

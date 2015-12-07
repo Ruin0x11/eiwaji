@@ -37,8 +37,8 @@ module Eiwaji
 
     def initLibraries
       JDict.configure do |config|
-        config.dictionary_path = '/home/ruin'
-        config.index_path = '/home/ruin/build/index_eiwaji'
+        config.dictionary_path = ENV['HOME'] + '/.dicts'
+        config.index_path = ENV['HOME'] + '/.dicts/index'
         config.lazy_index_loading = false
       end
 
@@ -120,8 +120,10 @@ module Eiwaji
     end
 
     def openSettings()
-      settings = Eiwaji::SettingsDialog.new
+      settings = Eiwaji::SettingsDialog.new(self)
       settings.exec
+      @dict = JDict::JMDict.new()
+      pp JDict.configuration
     end
 
   end

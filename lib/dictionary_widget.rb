@@ -41,8 +41,10 @@ module Eiwaji
       resultIndex = @ui.searchResults.model.index(row, 1)
       kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
       resultIndex = @ui.searchResults.model.index(row, 2)
+      meaning = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
+      resultIndex = @ui.searchResults.model.index(row, 3)
       sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
-      @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense)
+      @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense + "\nMeaning: " + meaning)
     end
 
     def search(query, lemma = nil)
@@ -89,7 +91,7 @@ module Eiwaji
         model.setData(index, Qt::Variant.new(sense))
 
         pos = entry.senses[0].parts_of_speech
-        pos = pos.join(" / ") + " " + sense unless pos.nil?
+        pos = pos.join(" / ") unless pos.nil?
         index = model.index(row, 3, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(pos))
 
@@ -99,7 +101,7 @@ module Eiwaji
         model.setData(index, Qt::Variant.new(similarity))
       end
       # sort by similarity
-      updateSortIndex(3)
+      updateSortIndex(4)
     end
   end
 end

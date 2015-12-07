@@ -1,10 +1,12 @@
 require 'jdict'
 require 'constants'
 
-require 'ui/ui_settings'
+require_relative 'ui/ui_settings'
 
 module Eiwaji
   class SettingsDialog < Qt::Dialog
+    slots 'saveAndClose()'
+
     def initialize(parent)
       super(parent)
 
@@ -30,26 +32,31 @@ module Eiwaji
                            JDict::JMDictConstants::Languages::SPANISH => "Spanish",
                            JDict::JMDictConstants::Languages::SLOVENIAN => "Slovenian",
                            JDict::JMDictConstants::Languages::SWEDISH => "Swedish",
-                           JDict::JMDictConstants::Languages::HUNGARIAN => "Hungarian",
+                           JDict::JMDictConstants::Languages::HUNGARIAN => "Hungarian" }
+    end
 
     def loadSettings
       config = JDict.configuration
-      languages = JDict::JMDictConstants::Languages.constants.map {|l| @languages_hash[l]}
-      @ui.dictLanguageBox.addItems(languages)
-      index = @ui.dictLanguageBox.findData(JDict.configuration.language)
+      languages = JDict::JMDictConstants::Languages.constants.map {|l| languages_hash[JDict::JMDictConstants::Languages.const_get(l)]}.compact
+      languages.each {|l| @ui.dictLanguageBox.addItem(l) }
+      index = @ui.dictLanguageBox.findText(languages_hash[JDict.configuration.language])
       if index == -1
-        index = @ui.dictLanguageBox.findData("English")
+        index = @ui.dictLanguageBox.findText("English")
       end
-      @ui.dictLanguageBox.index = index
+      @ui.dictLanguageBox.currentIndex = index
 
       @ui.maxHistoryEntriesBox.value = 50
       @ui.maxResultsBox.value = JDict.configuration.num_results
-  end
+    end
 
     def saveSettings
+      JDict.reset
       JDict.configure do |config|
-        config.num_results = @ui.maxHistoryEntriesBox.value
-        config.language = @languages_hash.key(@ui.dictLanguageBox.index)
+        config.dictionary_path = ENV['HOME'] + '/.dicts'
+        config.index_path = ENV['HOME'] + '/.dicts/index'
+        config.lazy_index_loading = false
+        config.num_results = @ui.maxResultsBox.value
+        config.language = @languages_hash.key(@ui.dictLanguageBox.currentText)
       end
     end
 
@@ -57,4 +64,5 @@ module Eiwaji
       saveSettings()
       close()
     end
+  end
 end
