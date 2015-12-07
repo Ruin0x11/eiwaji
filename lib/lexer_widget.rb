@@ -19,7 +19,6 @@ module Eiwaji
 
       connect(@ui.lexerTextBrowser, SIGNAL('anchorClicked(QUrl)'),
               self, SLOT('wordClicked(QUrl)'))
-
     end
 
     def textBrowser
@@ -34,11 +33,12 @@ module Eiwaji
 
         hrefRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"/
         resultsIndex = hrefRegex.match(fragment.toHtml)
+
         if not resultsIndex or resultsIndex.size != 2
           Qt::ToolTip.hideText
         else
           word = @lexerResults[resultsIndex[1].to_i]
-          Qt::ToolTip.showText(event.globalPos(), word.word + " " + word.part_of_speech.name)
+          Qt::ToolTip.showText(event.globalPos(), word.lemma + " " + word.part_of_speech.name)
         end
       end
       super(event)

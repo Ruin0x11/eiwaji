@@ -52,11 +52,12 @@ module Eiwaji
       
       results = @dict.search(query)
 
-      model = Qt::StandardItemModel.new(results.size, 4)
+      model = Qt::StandardItemModel.new(results.size, 5)
       model.setHeaderData(0, Qt::Horizontal, Qt::Variant.new(tr("Kanji")))
       model.setHeaderData(1, Qt::Horizontal, Qt::Variant.new(tr("Kana")))
       model.setHeaderData(2, Qt::Horizontal, Qt::Variant.new(tr("Sense")))
-      model.setHeaderData(3, Qt::Horizontal, Qt::Variant.new(tr("Similarity")))
+      model.setHeaderData(3, Qt::Horizontal, Qt::Variant.new(tr("Meaning")))
+      model.setHeaderData(4, Qt::Horizontal, Qt::Variant.new(tr("Similarity")))
       @ui.searchResults.model = model
 
       connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
@@ -84,14 +85,17 @@ module Eiwaji
         model.setData(index, Qt::Variant.new(kana))
 
         sense = entry.senses[0].glosses.join(", ")
-        pos = entry.senses[0].parts_of_speech
-        # sense = pos.join(" / ") + " " + sense unless pos.nil?
         index = model.index(row, 2, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(sense))
 
+        pos = entry.senses[0].parts_of_speech
+        pos = pos.join(" / ") + " " + sense unless pos.nil?
+        index = model.index(row, 3, Qt::ModelIndex.new)
+        model.setData(index, Qt::Variant.new(pos))
+
         similarity = (@white.similarity(lemma, kana))
         similarity += (@white.similarity(lemma, kanji)) unless kanji.nil?
-        index = model.index(row, 3, Qt::ModelIndex.new)
+        index = model.index(row, 4, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(similarity))
       end
       # sort by similarity
