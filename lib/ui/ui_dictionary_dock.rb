@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'dictionary_dock.ui'
 **
-** Created: 土 12月 12 15:45:27 2015
+** Created: 土 12月 12 17:06:01 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -23,7 +23,7 @@ class Ui_DictionaryWidget
         dictionaryWidget.objectName = "dictionaryWidget"
     end
     dictionaryWidget.resize(537, 484)
-    dictionaryWidget.minimumSize = Qt::Size.new(200, 200)
+    dictionaryWidget.minimumSize = Qt::Size.new(320, 380)
     dictionaryWidget.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
     dictionaryWidget.allowedAreas = Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
     @dockWidgetContents = Qt::Widget.new(dictionaryWidget)
@@ -59,6 +59,9 @@ class Ui_DictionaryWidget
     @verticalLayout_3.setContentsMargins(0, 0, 0, 0)
     @wordDetails = Qt::TextBrowser.new(@dockWidgetContents_2)
     @wordDetails.objectName = "wordDetails"
+    @font = Qt::Font.new
+    @font.pointSize = 12
+    @wordDetails.font = @font
 
     @verticalLayout_3.addWidget(@wordDetails)
 

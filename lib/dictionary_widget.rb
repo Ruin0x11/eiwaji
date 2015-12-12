@@ -17,6 +17,7 @@ module Eiwaji
       @white = Text::WhiteSimilarity.new
       
       connect(@ui.searchResults, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+      connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
       connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
 
       connect(@ui.searchBox, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))

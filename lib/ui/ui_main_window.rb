@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'main_window.ui'
 **
-** Created: 日 12月 6 15:32:30 2015
+** Created: 土 12月 12 17:06:01 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -37,6 +37,9 @@ class Ui_MainWindow
     @verticalLayout.objectName = "verticalLayout"
     @bigEditor = Qt::TextBrowser.new(@centralwidget)
     @bigEditor.objectName = "bigEditor"
+    @font = Qt::Font.new
+    @font.pointSize = 12
+    @bigEditor.font = @font
     @bigEditor.readOnly = false
 
     @verticalLayout.addWidget(@bigEditor)

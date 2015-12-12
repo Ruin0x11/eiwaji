@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'lexer.ui'
 **
-** Created: 土 12月 12 15:45:27 2015
+** Created: 土 12月 12 17:06:01 2015
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -78,6 +78,7 @@ class Ui_LexerWidget
 
     def retranslateUi(lexerWidget)
     lexerWidget.windowTitle = Qt::Application.translate("LexerWidget", "Lexer", nil, Qt::Application::UnicodeUTF8)
+    @buttonPrev.accessibleName = ''
     @buttonPrev.text = Qt::Application.translate("LexerWidget", "...", nil, Qt::Application::UnicodeUTF8)
     @buttonNext.text = Qt::Application.translate("LexerWidget", "...", nil, Qt::Application::UnicodeUTF8)
     end # retranslateUi

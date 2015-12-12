@@ -12,8 +12,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>200</width>
-    <height>200</height>
+    <width>320</width>
+    <height>380</height>
    </size>
   </property>
   <property name="features">
@@ -77,7 +77,13 @@
         <widget class="QWidget" name="dockWidgetContents_2">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QTextBrowser" name="wordDetails"/>
+           <widget class="QTextBrowser" name="wordDetails">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

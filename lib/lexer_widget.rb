@@ -6,6 +6,7 @@ module Eiwaji
   class LexerWidget < Qt::DockWidget
 
     POS_IGNORE = [Ve::PartOfSpeech::Symbol]
+    HISTORY_STRING_LENGTH = 30
 
     slots 'wordClicked(QUrl)', 'historyItemChanged(int)', 'historyPrev()', 'historyNext()'
 
@@ -63,7 +64,7 @@ module Eiwaji
 
     def historyNext
       index = @ui.historyBox.currentIndex - 1
-      index = 0 if index < 0
+      index = 1 if index < 1
       @ui.historyBox.setCurrentIndex(index)
     end
 
@@ -72,7 +73,7 @@ module Eiwaji
 
       if append_to_history
         @ui.historyBox.setCurrentIndex(0)
-        truncated_text = text.size < 50? text : text[0..50] + "..."
+        truncated_text = text.size < HISTORY_STRING_LENGTH ? text : text[0..HISTORY_STRING_LENGTH-1] + "..."
         @ui.historyBox.insertItem(1, truncated_text, Qt::Variant.new(tr(text))) 
       end
 
@@ -87,14 +88,17 @@ module Eiwaji
     end
 
     def wordClicked(url)
-      raise "No results from the lexer." if @lexerResults.empty?
+      searchWord(url.path.to_i)
+    end
 
-      word = @lexerResults[url.path.to_i]
-      pp word
+    def searchWord(ref)
+      raise "No results from the lexer." if @lexerResults.empty?
+      word = @lexerResults[ref]
       query = word.tokens[0][:lemma]
       lemma = word.lemma
       parent.search(query, lemma)
     end
+    
 
     # def part_of_speech_colors
     #   @part_of_speech_colors ||= {
@@ -111,18 +115,18 @@ module Eiwaji
 
     def part_of_speech_colors
       @part_of_speech_colors ||= {
-                                  :verb => "#808080",
-                                  :noun => "#000000",
-                                  :proper_noun => "#0000FF",
-                                  :symbol => "#000000",
-                                  :postposition => "#FF0000",
-                                  :pronoun => "#008080",
-                                  :adjective => "#008000",
-                                  :adverb => "#43C6DB",
-                                  :conjunction => "#FFA500",
-                                  :background => "#FFFFFF",
-                                  :default => "#FF00FF"
-                                 }
+        :verb => "#808080",
+        :noun => "#000000",
+        :proper_noun => "#0000FF",
+        :symbol => "#000000",
+        :postposition => "#FF0000",
+        :pronoun => "#008080",
+        :adjective => "#008000",
+        :adverb => "#43C6DB",
+        :conjunction => "#FFA500",
+        :background => "#FFFFFF",
+        :default => "#FF00FF"
+      }
     end
 
     def convWord(word, index)

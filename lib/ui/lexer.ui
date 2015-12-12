@@ -31,6 +31,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QToolButton" name="buttonPrev">
+        <property name="accessibleName">
+         <string/>
+        </property>
         <property name="text">
          <string>...</string>
         </property>
