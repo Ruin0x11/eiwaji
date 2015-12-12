@@ -1,6 +1,5 @@
 # coding: utf-8
 require 'jdict'
-require 'jmdict'
 require 'pp'
 require 'text'
 
@@ -37,9 +36,6 @@ module Eiwaji
 
     def initLibraries
       JDict.configure do |config|
-        config.dictionary_path = ENV['HOME'] + '/.dicts'
-        config.index_path = ENV['HOME'] + '/.dicts/index'
-        config.lazy_index_loading = false
       end
 
       clipboard = Qt::Application.clipboard
@@ -122,8 +118,8 @@ module Eiwaji
     def openSettings()
       settings = Eiwaji::SettingsDialog.new(self)
       settings.exec
-      @dict = JDict::JMDict.new()
       pp JDict.configuration
+      @dictionary_widget.reset
     end
 
   end

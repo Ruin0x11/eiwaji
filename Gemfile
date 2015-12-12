@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 gem 'ruby-jdict', :git => 'https://github.com/Ruin0x11/ruby-jdict.git'
-gem 've', '~>0.0.3'
-gem 'ferret', '~>0.11.8.6'
+gem 've', :git => 'https://github.com/Ruin0x11/ve.git', :branch => 'which' #'~>0.0.3'
+# gem 'ferret', '~>0.11.8.6'
 gem 'text', '~>1.3.1'
 gem 'qtbindings', '~>4.8.6.2'

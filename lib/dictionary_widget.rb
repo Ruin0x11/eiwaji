@@ -1,5 +1,4 @@
 require 'jdict'
-require 'jmdict'
 
 require_relative 'ui/ui_dictionary_dock'
 
@@ -23,7 +22,11 @@ module Eiwaji
       connect(@ui.searchBox, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
     end
 
-    def queryEntered()
+    def reset
+      @dict = JDict::JMDict.new()
+    end
+
+    def queryEntered
       puts "asdf"
       query = @ui.searchBox.text
       search(query)
@@ -37,14 +40,16 @@ module Eiwaji
       row = index.row
 
       resultIndex = @ui.searchResults.model.index(row, 0)
-      kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
+      kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
       resultIndex = @ui.searchResults.model.index(row, 1)
-      kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
+      kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
       resultIndex = @ui.searchResults.model.index(row, 2)
-      meaning = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
-      resultIndex = @ui.searchResults.model.index(row, 3)
-      sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value.force_encoding("UTF-8")
-      @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense + "\nMeaning: " + meaning)
+      sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
+      kanji = (kanji.nil? ? "" : kanji.force_encoding("UTF-8"))
+      kana = (kana.nil? ? "" : kana.force_encoding("UTF-8"))
+      meaning = (meaning.nil? ? "" : meaning.force_encoding("UTF-8"))
+      sense = (sense.nil? ? "" : sense.force_encoding("UTF-8"))
+      @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense)
     end
 
     def search(query, lemma = nil)
@@ -54,12 +59,11 @@ module Eiwaji
       
       results = @dict.search(query)
 
-      model = Qt::StandardItemModel.new(results.size, 5)
+      model = Qt::StandardItemModel.new(results.size, 4)
       model.setHeaderData(0, Qt::Horizontal, Qt::Variant.new(tr("Kanji")))
       model.setHeaderData(1, Qt::Horizontal, Qt::Variant.new(tr("Kana")))
       model.setHeaderData(2, Qt::Horizontal, Qt::Variant.new(tr("Sense")))
-      model.setHeaderData(3, Qt::Horizontal, Qt::Variant.new(tr("Meaning")))
-      model.setHeaderData(4, Qt::Horizontal, Qt::Variant.new(tr("Similarity")))
+      model.setHeaderData(3, Qt::Horizontal, Qt::Variant.new(tr("Similarity")))
       @ui.searchResults.model = model
 
       connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
@@ -86,7 +90,21 @@ module Eiwaji
         index = model.index(row, 1, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(kana))
 
-        sense = entry.senses[0].glosses.join(", ")
+        if entry.senses.size > 1
+          sense = entry.senses.map.with_index(1) do |s, i|
+            pos = s.parts_of_speech.nil? ? "" : "(" + s.parts_of_speech.join(", ") + ") "
+            glosses = s.glosses.join(", ")
+            pos + glosses
+          end
+          
+          sense = sense.reverse.join(" \n ")
+        else
+          s = entry.senses.first
+          pos = s.parts_of_speech.nil? ? "" : "(" + s.parts_of_speech.join(", ") + ") "
+          glosses = s.glosses.join(", ")
+          sense = pos + glosses
+        end
+        
         index = model.index(row, 2, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(sense))
 
@@ -95,13 +113,30 @@ module Eiwaji
         index = model.index(row, 3, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(pos))
 
-        similarity = (@white.similarity(lemma, kana))
-        similarity += (@white.similarity(lemma, kanji)) unless kanji.nil?
-        index = model.index(row, 4, Qt::ModelIndex.new)
+        similarity = kana.split(",").inject(0.0) do |max, k|
+          sim = @white.similarity(lemma, k) 
+          if sim.nan?
+            sim = (lemma == k ? 1.0 : 0.0)
+          end
+          [max, sim].max
+        end
+
+        # if there are multiple kanji readings, find the most similar one
+        unless kanji.nil?
+          similarity += kanji.split(",").inject(0.0) do |max, k|
+            sim = @white.similarity(lemma, k) 
+            if sim.nan?
+              sim = (lemma == k ? 1.0 : 0.0)
+            end
+            [max, sim].max
+          end
+        end
+        
+        index = model.index(row, 3, Qt::ModelIndex.new)
         model.setData(index, Qt::Variant.new(similarity))
       end
       # sort by similarity
-      updateSortIndex(4)
+      updateSortIndex(3)
     end
   end
 end

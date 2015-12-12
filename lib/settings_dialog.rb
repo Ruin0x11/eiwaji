@@ -52,9 +52,6 @@ module Eiwaji
     def saveSettings
       JDict.reset
       JDict.configure do |config|
-        config.dictionary_path = ENV['HOME'] + '/.dicts'
-        config.index_path = ENV['HOME'] + '/.dicts/index'
-        config.lazy_index_loading = false
         config.num_results = @ui.maxResultsBox.value
         config.language = @languages_hash.key(@ui.dictLanguageBox.currentText)
       end
