@@ -39,6 +39,9 @@ module Eiwaji
       end
 
       clipboard = Qt::Application.clipboard
+
+      # on Windows, it appears that the clipboard is not monitored until it is changed within the Qt application.
+      # clipboard.setText(clipboard.text.force_encoding("UTF-8")) if clipboard.mimeData.hasText
       connect(clipboard, SIGNAL('changed(QClipboard::Mode)'), self, SLOT('clipboardChanged(QClipboard::Mode)'))
     end
     
@@ -51,7 +54,7 @@ module Eiwaji
       clipboard = Qt::Application.clipboard
       
       if clipboard.mimeData.hasText && mode == Qt::Clipboard::Clipboard && @clipboardCaptureAct.isChecked
-        @ui.bigEditor.setText(clipboard.text)
+        @ui.bigEditor.setText(clipboard.text.force_encoding("UTF-8"))
         lexEditorText
       end
     end
