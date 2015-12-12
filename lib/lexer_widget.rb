@@ -52,7 +52,7 @@ module Eiwaji
 
     def historyItemChanged(index)
       return if index == 0
-      text = @ui.historyBox.itemData(index, Qt::DisplayRole).toString
+      text = @ui.historyBox.itemData(index).value
       lexText(text)
     end
 
@@ -74,7 +74,7 @@ module Eiwaji
       if append_to_history
         @ui.historyBox.setCurrentIndex(0)
         truncated_text = text.size < HISTORY_STRING_LENGTH ? text : text[0..HISTORY_STRING_LENGTH-1] + "..."
-        @ui.historyBox.insertItem(1, truncated_text, Qt::Variant.new(tr(text))) 
+        @ui.historyBox.insertItem(1, truncated_text, Qt::Variant.new(text)) 
       end
 
       words = Ve.in(:ja).words(text)

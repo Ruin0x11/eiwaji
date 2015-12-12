@@ -28,7 +28,6 @@ module Eiwaji
     end
 
     def queryEntered
-      puts "asdf"
       query = @ui.searchBox.text.force_encoding("UTF-8")
       search(query)
     end
