@@ -47,7 +47,7 @@ module Eiwaji
     
     def lexEditorText
       text = @ui.bigEditor.toPlainText
-      @lexer_widget.lexText(text)
+      @lexer_widget.lexText(text, true)
     end
 
     def clipboardChanged(mode)

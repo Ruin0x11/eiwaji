@@ -7,7 +7,7 @@ module Eiwaji
 
     POS_IGNORE = [Ve::PartOfSpeech::Symbol]
 
-    slots 'wordClicked(QUrl)'
+    slots 'wordClicked(QUrl)', 'historyItemChanged(int)', 'historyPrev()', 'historyNext()'
 
     def initialize(parent)
       super(parent)
@@ -19,6 +19,11 @@ module Eiwaji
 
       connect(@ui.lexerTextBrowser, SIGNAL('anchorClicked(QUrl)'),
               self, SLOT('wordClicked(QUrl)'))
+
+      @ui.historyBox.insertItem(0, "...")
+      connect(@ui.historyBox, SIGNAL('currentIndexChanged(int)'), self, SLOT('historyItemChanged(int)'))
+      connect(@ui.buttonNext, SIGNAL('clicked()'), self, SLOT('historyNext()'))
+      connect(@ui.buttonPrev, SIGNAL('clicked()'), self, SLOT('historyPrev()'))
     end
 
     def textBrowser
@@ -44,8 +49,32 @@ module Eiwaji
       super(event)
     end
 
-    def lexText(text)
+    def historyItemChanged(index)
+      return if index == 0
+      text = @ui.historyBox.itemData(index, Qt::DisplayRole).toString
+      lexText(text)
+    end
+
+    def historyPrev
+      index = @ui.historyBox.currentIndex + 1
+      index = @ui.historyBox.count - 1 if index >= @ui.historyBox.count - 1
+      @ui.historyBox.setCurrentIndex(index)
+    end
+
+    def historyNext
+      index = @ui.historyBox.currentIndex - 1
+      index = 0 if index < 0
+      @ui.historyBox.setCurrentIndex(index)
+    end
+
+    def lexText(text, append_to_history=false)
       text = text.force_encoding("UTF-8")
+
+      if append_to_history
+        @ui.historyBox.setCurrentIndex(0)
+        truncated_text = text.size < 50? text : text[0..50] + "..."
+        @ui.historyBox.insertItem(1, truncated_text, Qt::Variant.new(tr(text))) 
+      end
 
       words = Ve.in(:ja).words(text)
 
