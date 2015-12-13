@@ -5,7 +5,7 @@ require_relative 'ui/ui_dictionary_dock'
 module Eiwaji
   class DictionaryWidget < Qt::DockWidget
 
-    slots 'updateSortIndex(int)', 'queryEntered()', 'getWordDetails(QModelIndex)'
+    slots 'updateSortIndex(int)', 'queryEntered()', 'getWordDetailsAtIndex(QModelIndex)'
     
     def initialize(parent)
       super(parent)
@@ -17,8 +17,8 @@ module Eiwaji
       @white = Text::WhiteSimilarity.new
       
       connect(@ui.searchResults, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
-      connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
-      connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
+      connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
+      connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
 
       connect(@ui.searchBox, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
     end
@@ -36,9 +36,12 @@ module Eiwaji
       @ui.searchResults.sortByColumn(index)
     end
 
-    def getWordDetails(index)
+    def getWordDetailsAtIndex(index)
       row = index.row
+      getWordDetails(row)
+    end
 
+    def getWordDetails(row)
       resultIndex = @ui.searchResults.model.index(row, 0)
       kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
       resultIndex = @ui.searchResults.model.index(row, 1)
@@ -137,6 +140,12 @@ module Eiwaji
       end
       # sort by similarity
       updateSortIndex(3)
+
+      if results.size > 0
+        getWordDetails(0)
+      else
+        @ui.wordDetails.clear
+      end
     end
   end
 end

@@ -1,8 +1,8 @@
 =begin
 ** Form generated from reading ui file 'lexer.ui'
 **
-** Created: 土 12月 12 17:06:01 2015
-**      by: Qt User Interface Compiler version 4.8.7
+** Created: 土 12 12 17:52:38 2015
+**      by: Qt User Interface Compiler version 4.8.6
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 =end
@@ -44,6 +44,9 @@ class Ui_LexerWidget
 
     @historyBox = Qt::ComboBox.new(@dockWidgetContents)
     @historyBox.objectName = "historyBox"
+    @font = Qt::Font.new
+    @font.pointSize = 11
+    @historyBox.font = @font
 
     @horizontalLayout.addWidget(@historyBox)
 
@@ -55,9 +58,9 @@ class Ui_LexerWidget
     @lexerTextBrowser = Qt::TextBrowser.new(@dockWidgetContents)
     @lexerTextBrowser.objectName = "lexerTextBrowser"
     @lexerTextBrowser.minimumSize = Qt::Size.new(0, 0)
-    @font = Qt::Font.new
-    @font.pointSize = 18
-    @lexerTextBrowser.font = @font
+    @font1 = Qt::Font.new
+    @font1.pointSize = 18
+    @lexerTextBrowser.font = @font1
     @lexerTextBrowser.openLinks = false
 
     @verticalLayout.addWidget(@lexerTextBrowser)
