@@ -1,14 +1,41 @@
 module Eiwaji
-  class DictionaryTableModel < Qt::AbstractTablemodel
-    def initialize(entries)
-      @entries = entries
+  class DictionaryTableModel < Qt::AbstractTableModel
+    def initialize(entries, lemma)
       @white = Text::WhiteSimilarity.new
-      super
+      @entries = entries
+      @lemma = lemma
+      calcSim
+      super()
     end
 
-    def entries=(entries)
-      @entries = entries
-      reset
+    def calcSim
+      @sim = Array.new(@entries.size)
+      @entries.each_with_index do |entry, i|
+        similarity = 0.0
+        unless entry.kana.nil?
+          if entry.kana.kind_of?(Array)
+            similarity += entry.kana.inject(0.0) do |max, k|
+              sim = calcSimilarity(k)
+              [max, sim].max
+            end
+          else
+            similarity += calcSimilarity(entry.kana)
+          end
+        end
+
+        # if there are multiple kanji readings, find the most similar one
+        unless entry.kanji.nil?
+          if entry.kanji.kind_of?(Array)
+            similarity += entry.kanji.inject(0.0) do |max, k|
+              sim = calcSimilarity(k)
+              [max, sim].max
+            end
+          else
+            similarity += calcSimilarity(entry.kanji)
+          end
+        end
+        @sim[i] = similarity
+      end
     end
 
     def columnCount(parent)
@@ -26,8 +53,10 @@ module Eiwaji
     def data(index, role=Qt::DisplayRole)
       invalid = Qt::Variant.new
       return invalid unless role == Qt::DisplayRole
+      return invalid if @entries.empty?
+      return invalid if @entries.size <= index.row
+      return invalid unless index.isValid
       entry = @entries[index.row]
-      return invalid if entry.nil?
 
       v = case index.column
           when 0
@@ -55,42 +84,31 @@ module Eiwaji
               pos + glosses
             end
           when 3
+            @sim[index.row]
+          else 
+            raise "invalid column #{index.column}"
+          end || ""
+      return Qt::Variant.new(v)
+    end
 
-            similarity = kana.split(",").inject(0.0) do |max, k|
-              sim = @white.similarity(lemma, k) 
-              if sim.nan?
-                sim = (lemma == k ? 1.0 : 0.0)
-              end
-              [max, sim].max
-            end
-
-            # if there are multiple kanji readings, find the most similar one
-            unless kanji.nil?
-              similarity += kanji.split(",").inject(0.0) do |max, k|
-                sim = @white.similarity(lemma, k) 
-                if sim.nan?
-                  sim = (lemma == k ? 1.0 : 0.0)
-                end
-                [max, sim].max
-              end
-            end
+    def calcSimilarity(word)
+      w = word.force_encoding("UTF-8")
+      sim = @white.similarity(@lemma, w) 
+      if sim.nan?
+        sim = (@lemma == w ? 1.0 : 0.0)
+      end
+      sim
+    end
+    
+    def headerData(section, orientation, role=Qt::DisplayRole)
+      return Qt::Variant.new if role != Qt::DisplayRole
+      v = case orientation
+          when Qt::Horizontal
+            ["Kanji","Kana","Meaning","Similarity"][section]
+          else
+            section.to_s
           end
-      
-    else 
-      raise "invalid column #{index.column}"
-    end || ""
-    return Qt::Variant.new(v)
+      return Qt::Variant.new(v)
+    end
   end
-  
-  def headerData(section, orientation, role=Qt::DisplayRole)
-    v = case orientation
-        when Qt::Horizontal
-          ["Kanji","Kana","Meaning","Similarity"][section]
-        else
-          section.to_s
-        end
-    return Qt::Variant.new(v)
-  end
-
-end
 end

@@ -16,8 +16,7 @@ module Eiwaji
 
       @dict = JDict::JMDict.new()
       @white = Text::WhiteSimilarity.new
-      
-      connect(@ui.searchResults, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+
       connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
       connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
 
@@ -59,10 +58,11 @@ module Eiwaji
       
       results = @dict.search(query)
 
-      @ui.searchResults.model ||= DictionaryTableModel.new(results)
-      @ui.searchResults.model.entries = results
+      @ui.searchResults.model = Qt::SortFilterProxyModel.new(@ui.searchResults)
+      @ui.searchResults.model.source_model = DictionaryTableModel.new(results, lemma)
 
       connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+      @ui.searchResults.horizontalHeader.setVisible(true)
       
       # sort by similarity
       updateSortIndex(3)
