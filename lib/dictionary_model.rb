@@ -1,11 +1,11 @@
 module Eiwaji
   class DictionaryTableModel < Qt::AbstractTableModel
-    def initialize(entries, lemma)
+    def initialize(parent, entries, lemma)
+      super(parent)
       @white = Text::WhiteSimilarity.new
       @entries = entries
       @lemma = lemma
       calcSim
-      super()
     end
 
     def calcSim
@@ -43,7 +43,11 @@ module Eiwaji
     end
 
     def rowCount(parent)
-      @entries.size
+      if parent.valid?
+        return 0
+      else
+        return @entries.size
+      end
     end
 
     def flags(index)

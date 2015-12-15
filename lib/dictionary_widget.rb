@@ -6,7 +6,7 @@ require_relative 'dictionary_model'
 module Eiwaji
   class DictionaryWidget < Qt::DockWidget
 
-    slots 'updateSortIndex(int)', 'queryEntered()', 'getWordDetails(QModelIndex)'
+    slots 'updateSortIndex(int)', 'getWordDetailsAtIndex(QModelIndex)', 'queryEntered()', 'getWordDetails()'
     
     def initialize(parent)
       super(parent)
@@ -17,8 +17,8 @@ module Eiwaji
       @dict = JDict::JMDict.new()
       @white = Text::WhiteSimilarity.new
 
-      connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
-      connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetails(QModelIndex)'))
+      connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
+      connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
 
       connect(@ui.searchBox, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
     end
@@ -36,9 +36,12 @@ module Eiwaji
       @ui.searchResults.sortByColumn(index)
     end
 
-    def getWordDetails(index)
+    def getWordDetailsAtIndex(index)
       row = index.row
+      getWordDetails(row)
+    end
 
+    def getWordDetails(row)
       resultIndex = @ui.searchResults.model.index(row, 0)
       kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
       resultIndex = @ui.searchResults.model.index(row, 1)
@@ -59,10 +62,17 @@ module Eiwaji
       results = @dict.search(query)
 
       @ui.searchResults.model = Qt::SortFilterProxyModel.new(@ui.searchResults)
-      @ui.searchResults.model.source_model = DictionaryTableModel.new(results, lemma)
+      @ui.searchResults.model.source_model = DictionaryTableModel.new(self, results, lemma)
 
       connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
       @ui.searchResults.horizontalHeader.setVisible(true)
+      @ui.searchResults.verticalHeader.setVisible(false)
+
+      if results.size > 0
+        getWordDetails(0)
+      else
+        @ui.wordDetails.clear
+      end
       
       # sort by similarity
       updateSortIndex(3)

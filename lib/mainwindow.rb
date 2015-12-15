@@ -35,9 +35,6 @@ module Eiwaji
     end
 
     def initLibraries
-      JDict.configure do |config|
-      end
-
       clipboard = Qt::Application.clipboard
 
       # on Windows, it appears that the clipboard is not monitored until it is changed within the Qt application.
