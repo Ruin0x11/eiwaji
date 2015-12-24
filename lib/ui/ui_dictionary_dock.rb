@@ -1,8 +1,8 @@
 =begin
 ** Form generated from reading ui file 'dictionary_dock.ui'
 **
-** Created: 土 12月 12 17:06:01 2015
-**      by: Qt User Interface Compiler version 4.8.7
+** Created: 土 12 12 17:57:15 2015
+**      by: Qt User Interface Compiler version 4.8.6
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 =end
@@ -22,8 +22,8 @@ class Ui_DictionaryWidget
     if dictionaryWidget.objectName.nil?
         dictionaryWidget.objectName = "dictionaryWidget"
     end
-    dictionaryWidget.resize(537, 484)
-    dictionaryWidget.minimumSize = Qt::Size.new(320, 380)
+    dictionaryWidget.resize(500, 500)
+    dictionaryWidget.minimumSize = Qt::Size.new(420, 400)
     dictionaryWidget.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
     dictionaryWidget.allowedAreas = Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
     @dockWidgetContents = Qt::Widget.new(dictionaryWidget)
@@ -33,6 +33,9 @@ class Ui_DictionaryWidget
     @verticalLayout_2.setContentsMargins(0, 0, 0, 0)
     @searchBox = Qt::LineEdit.new(@dockWidgetContents)
     @searchBox.objectName = "searchBox"
+    @font = Qt::Font.new
+    @font.pointSize = 11
+    @searchBox.font = @font
 
     @verticalLayout_2.addWidget(@searchBox)
 
@@ -59,9 +62,9 @@ class Ui_DictionaryWidget
     @verticalLayout_3.setContentsMargins(0, 0, 0, 0)
     @wordDetails = Qt::TextBrowser.new(@dockWidgetContents_2)
     @wordDetails.objectName = "wordDetails"
-    @font = Qt::Font.new
-    @font.pointSize = 12
-    @wordDetails.font = @font
+    @font1 = Qt::Font.new
+    @font1.pointSize = 12
+    @wordDetails.font = @font1
 
     @verticalLayout_3.addWidget(@wordDetails)
 

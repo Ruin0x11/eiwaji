@@ -7,6 +7,7 @@ module Eiwaji
 
     POS_IGNORE = [Ve::PartOfSpeech::Symbol]
     HISTORY_STRING_LENGTH = 30
+    MAX_HISTORY_ITEMS = 10
 
     slots 'wordClicked(QUrl)', 'historyItemChanged(int)', 'historyPrev()', 'historyNext()'
 
@@ -58,6 +59,7 @@ module Eiwaji
 
     def historyPrev
       index = @ui.historyBox.currentIndex + 1
+      index += 1 if @ui.historyBox.currentIndex == 0
       index = @ui.historyBox.count - 1 if index >= @ui.historyBox.count - 1
       @ui.historyBox.setCurrentIndex(index)
     end
@@ -75,6 +77,8 @@ module Eiwaji
         @ui.historyBox.setCurrentIndex(0)
         truncated_text = text.size < HISTORY_STRING_LENGTH ? text : text[0..HISTORY_STRING_LENGTH-1] + "..."
         @ui.historyBox.insertItem(1, truncated_text, Qt::Variant.new(text)) 
+        @ui.historyBox.removeItem(MAX_HISTORY_ITEMS+1) if @ui.historyBox.count > MAX_HISTORY_ITEMS+1
+        
       end
 
       words = Ve.in(:ja).words(text)

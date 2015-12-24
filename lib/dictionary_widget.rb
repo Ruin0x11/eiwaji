@@ -16,7 +16,6 @@ module Eiwaji
 
       @dict = JDict::JMDict.new()
       @white = Text::WhiteSimilarity.new
-
       connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
       connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
 
@@ -68,14 +67,15 @@ module Eiwaji
       @ui.searchResults.horizontalHeader.setVisible(true)
       @ui.searchResults.verticalHeader.setVisible(false)
 
+      
+      # sort by similarity
+      updateSortIndex(3)
+
       if results.size > 0
         getWordDetails(0)
       else
         @ui.wordDetails.clear
       end
-      
-      # sort by similarity
-      updateSortIndex(3)
     end
   end
 end

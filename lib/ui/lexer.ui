@@ -47,7 +47,13 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="historyBox"/>
+       <widget class="QComboBox" name="historyBox">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
