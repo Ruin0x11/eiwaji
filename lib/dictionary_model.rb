@@ -5,13 +5,14 @@ module Eiwaji
       @white = Text::WhiteSimilarity.new
       @entries = entries
       @lemma = lemma
-      calcSim
+      calcSimilarityForAll
     end
 
-    def calcSim
+    def calcSimilarityForAll
       @sim = Array.new(@entries.size)
       @entries.each_with_index do |entry, i|
         similarity = 0.0
+        # if there are multiple kana/kanji readings, get the highest similarity out of each
         unless entry.kana.nil?
           if entry.kana.kind_of?(Array)
             similarity += entry.kana.inject(0.0) do |max, k|
@@ -23,7 +24,6 @@ module Eiwaji
           end
         end
 
-        # if there are multiple kanji readings, find the most similar one
         unless entry.kanji.nil?
           if entry.kanji.kind_of?(Array)
             similarity += entry.kanji.inject(0.0) do |max, k|
@@ -63,7 +63,7 @@ module Eiwaji
       entry = @entries[index.row]
 
       v = case index.column
-          when 0
+          when 0 # kanji
             if not entry.kanji.empty?
               if entry.kanji.kind_of?(Array)
                 entry.kanji.map {|k| k.force_encoding("UTF-8") }.join(', ')
@@ -71,9 +71,9 @@ module Eiwaji
                 entry.kanji.force_encoding("UTF-8")
               end
             end
-          when 1
+          when 1 # kana
             entry.kana.map {|k| k.force_encoding("UTF-8") }.join(', ') unless entry.kana.nil?
-          when 2
+          when 2 # sense
             if entry.senses.size > 1
               sense = entry.senses.map.with_index(1) do |s, i|
                 pos = s.parts_of_speech.nil? ? "" : "(" + s.parts_of_speech.join(", ") + ") "
@@ -87,7 +87,7 @@ module Eiwaji
               glosses = s.glosses.join(", ")
               pos + glosses
             end
-          when 3
+          when 3 # similarity
             @sim[index.row]
           else 
             raise "invalid column #{index.column}"

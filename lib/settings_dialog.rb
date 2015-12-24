@@ -23,7 +23,6 @@ module Eiwaji
 
     def languages_hash
       @languages_hash ||= {
-                           # JDict::JMDictConstants::Languages::JAPANESE => "Japanese",
                            JDict::JMDictConstants::Languages::ENGLISH => "English",
                            JDict::JMDictConstants::Languages::DUTCH => "Dutch",
                            JDict::JMDictConstants::Languages::FRENCH => "French",

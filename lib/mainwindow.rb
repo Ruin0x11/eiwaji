@@ -11,8 +11,6 @@ require_relative 'settings_dialog'
 module Eiwaji
   class MainWindow < Qt::MainWindow
 
-    @is_editor_locked = false
-
     slots 'lexEditorText()', 'clipboardChanged(QClipboard::Mode)', 'toggleMainTextEditable()', 'openSettings()'
 
     def initialize(parent = nil)
@@ -42,6 +40,7 @@ module Eiwaji
       connect(clipboard, SIGNAL('changed(QClipboard::Mode)'), self, SLOT('clipboardChanged(QClipboard::Mode)'))
     end
     
+    # send the text in the main editor to the lexer widget
     def lexEditorText
       text = @ui.bigEditor.toPlainText
       @lexer_widget.lexText(text, true)
@@ -58,10 +57,8 @@ module Eiwaji
 
     def toggleMainTextEditable
       if @clipboardCaptureAct.isChecked
-        @is_editor_locked = true
         @ui.bigEditor.setEnabled(false)
       else
-        @is_editor_locked = false
         @ui.bigEditor.setEnabled(true)
       end
       
@@ -76,12 +73,12 @@ module Eiwaji
     end
 
     def createActions()
-      @veAct = Qt::Action.new(tr("LexIt"), self)
-      @veAct.statusTip = tr("Lexify text")
+      @veAct = Qt::Action.new(tr("Lex Text in Editor"), self)
+      @veAct.statusTip = tr("Send the text in the editor to the lexer widget.")
       connect(@veAct, SIGNAL('triggered()'), self, SLOT('lexEditorText()'))
 
       @clipboardCaptureAct = Qt::Action.new(tr("&Capture Clipboard"), self)
-      @clipboardCaptureAct.statusTip = tr("Send copied text to the lexer")
+      @clipboardCaptureAct.statusTip = tr("Automatically copy text to the editor and lexer")
       @clipboardCaptureAct.setCheckable(true)
       connect(@clipboardCaptureAct, SIGNAL('triggered()'), self, SLOT('toggleMainTextEditable()'))
 
@@ -100,18 +97,11 @@ module Eiwaji
     end
 
     def createDockWindows()
-      # color = Qt::Color.new(@part_of_speech_colors[:background])
-
-      # palette = @lexerView.palette
-      # palette.setColor(Qt::Palette::Base, color)
-      # @lexerView.setPalette(palette)
 
       @lexer_widget = LexerWidget.new(self)
-
       addDockWidget(Qt::BottomDockWidgetArea, @lexer_widget)
 
       @dictionary_widget = DictionaryWidget.new(self)
-      
       addDockWidget(Qt::RightDockWidgetArea, @dictionary_widget)
     end
 

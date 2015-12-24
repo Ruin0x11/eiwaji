@@ -47,12 +47,13 @@ module Eiwaji
       kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
       resultIndex = @ui.searchResults.model.index(row, 2)
       sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
-      kanji = (kanji.nil? ? "" : kanji.force_encoding("UTF-8"))
-      kana = (kana.nil? ? "" : kana.force_encoding("UTF-8"))
-      sense = (sense.nil? ? "" : sense.force_encoding("UTF-8"))
+      kanji = (kanji.nil? ? "" : kanji)
+      kana = (kana.nil? ? "" : kana)
+      sense = (sense.nil? ? "" : sense)
       @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense)
     end
 
+    # searches the JDict::JMDict for the given query, and sorts results by similarity to the provided lemma
     def search(query, lemma = nil)
       lemma ||= query
 
