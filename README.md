@@ -4,16 +4,13 @@ eiwaji is a Japanese-to-English lexer and dictionary. It uses [mecab](http://tak
 
 ## Requirements
 * Linux / OSX
-* Qt 4.8.x
-* cmake 2.8.x
-* gcc 4.x
+* [libxml-ruby](https://github.com/xml4r/libxml-ruby) requirements (libm, zlib, libiconv, libxml2)
+* [qtbindings](https://github.com/ryanmelt/qtbindings) requirements (Qt 4.8.x, cmake 2.8.x, gcc 4.x)
 * mecab & mecab-ipadic
-
-See [qtbindings](https://github.com/ryanmelt/qtbindings) for additional information on the Ruby Qt bindings.
 
 Tested on Ruby 2.2.3 & 2.2.4.
 
-Does not compile on Ruby 2.3.0 because of [this Ruby bug](https://bugs.ruby-lang.org/issues/11962) preventing the compilation of certain C++ extensions. If you install a separate Ruby version, it MUST be compiled with `--enable-shared`, or the application won't run. (If you're using ruby-build, this flag is [not set by default](https://github.com/rbenv/ruby-build/issues/35).)
+Does not build on Ruby 2.3.0 because of [this Ruby bug](https://bugs.ruby-lang.org/issues/11962) preventing the compilation of certain C++ extensions. If you install a separate Ruby version, it MUST be compiled with `--enable-shared`, or the application won't run. (If you're using ruby-build, this flag is [not set by default](https://github.com/rbenv/ruby-build/issues/35).)
 
 ## Installation
 ```
