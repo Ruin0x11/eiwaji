@@ -15,7 +15,9 @@ Does not build on Ruby 2.3.0 because of [this Ruby bug](https://bugs.ruby-lang.o
 ## Installation
 ```
 gem install eiwaji
-
+```
+Ensure that mecab and mecab-ipadic are installed on program start.
+```
 eiwaji
 ```
 
