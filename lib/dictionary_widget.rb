@@ -14,7 +14,12 @@ module Eiwaji
       @ui = Ui_DictionaryWidget.new
       @ui.setupUi(self)
 
-      @dict = JDict::JMDict.new()
+      if not File.exists? File.join(JDict.configuration.index_path, "fts5.db")
+        Qt::MessageBox.information(self, tr("No Index"),
+                    tr("No index file detected. Please wait while the index is built."))
+      end
+
+      reset()
       @white = Text::WhiteSimilarity.new
       connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
       connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
@@ -40,6 +45,7 @@ module Eiwaji
       getWordDetails(row)
     end
 
+    # retrieve word data from a row of the search results model
     def getWordDetails(row)
       resultIndex = @ui.searchResults.model.index(row, 0)
       kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
@@ -47,9 +53,9 @@ module Eiwaji
       kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
       resultIndex = @ui.searchResults.model.index(row, 2)
       sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
-      kanji = (kanji.nil? ? "" : kanji.force_encoding("UTF-8"))
-      kana = (kana.nil? ? "" : kana.force_encoding("UTF-8"))
-      sense = (sense.nil? ? "" : sense.force_encoding("UTF-8"))
+      kanji = (kanji.nil? ? "" : kanji)
+      kana = (kana.nil? ? "" : kana)
+      sense = (sense.nil? ? "" : sense)
       @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense)
     end
 

@@ -40,6 +40,7 @@ module Eiwaji
         cursor.select(Qt::TextCursor::WordUnderCursor)
         fragment = cursor.selection()
 
+        # works in this case, since the input is clearly defined in wordToHtml
         hrefRegex = /<a\s+(?:[^>]*?\s+)?href="([^"]*)"/
         resultsIndex = hrefRegex.match(fragment.toHtml)
 
@@ -110,6 +111,7 @@ module Eiwaji
       query = lemma if query == "*"
 
       p word
+      p query, lemma
 
       # search on the query and sort by the results most similar to the lemma
       parent.search(query, lemma)

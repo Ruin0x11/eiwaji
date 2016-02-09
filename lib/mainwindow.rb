@@ -2,6 +2,7 @@
 require 'jdict'
 require 'pp'
 require 'text'
+require 'mkmf'
 
 require_relative 'tableview'
 require_relative 'lexer_widget'
@@ -11,28 +12,38 @@ require_relative 'settings_dialog'
 module Eiwaji
   class MainWindow < Qt::MainWindow
 
+    CONFIG_PATH = "./eiwajirc"
+    DICTIONARY_PATH = "./dicts/"
+
     slots 'lexEditorText()', 'clipboardChanged(QClipboard::Mode)', 'toggleMainTextEditable()', 'openSettings()'
 
     def initialize(parent = nil)
       super(parent)
 
+      if find_executable('mecab') == nil
+        Qt::MessageBox.critical(self, tr("Mecab not installed"),
+                  tr("An installation of mecab was not detected. " +
+                     "Text analysis will not function properly."))
+      end
+
       @ui = Ui_MainWindow.new
       @ui.setupUi(self)
 
-      initLibraries()
+      if not File.exists? CONFIG_PATH
+        writeConfig
+      end
+      readConfig
+
+      initClipboard()
       createActions()
       createMenus()
       createStatusBar()
       createDockWindows()
 
       setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
-
-      @ui.bigEditor.setText("日本語（にほんご、にっぽんご）は、主に日本国内や日本人同士の間で使われている言語である。日本は法令によって「公用語」を規定していないが、法令その他の公用文は全て日本語で記述され、各種法令（裁判所法第74条、会社計算規則第57条、特許法施行規則第2条など）において日本語を用いることが定められるなど事実上の公用語となっており、学校教育の「国語」でも教えられる。")
-
-      lexEditorText()
     end
 
-    def initLibraries
+    def initClipboard
       clipboard = Qt::Application.clipboard
 
       # on Windows, it appears that the clipboard is not monitored until it is changed within the Qt application.
@@ -51,7 +62,7 @@ module Eiwaji
       
       if clipboard.mimeData.hasText && mode == Qt::Clipboard::Clipboard && @clipboardCaptureAct.isChecked
         @ui.bigEditor.setText(clipboard.text.force_encoding("UTF-8"))
-        lexEditorText
+        lexEditorText()
       end
     end
 
@@ -68,12 +79,16 @@ module Eiwaji
       @dictionary_widget.search(query, lemma)
     end
 
-    def createStatusBar()
+    def rebuild_dictionary
+      @dictionary_widget.reset
+    end
+
+    def createStatusBar
       statusBar().showMessage(tr("Ready"))
     end
 
-    def createActions()
-      @veAct = Qt::Action.new(tr("Lex Text in Editor"), self)
+    def createActions
+      @veAct = Qt::Action.new(tr("&Analyze Text"), self)
       @veAct.statusTip = tr("Send the text in the editor to the lexer widget.")
       connect(@veAct, SIGNAL('triggered()'), self, SLOT('lexEditorText()'))
 
@@ -87,7 +102,7 @@ module Eiwaji
       connect(@settingsAct, SIGNAL('triggered()'), self, SLOT('openSettings()'))
     end
 
-    def createMenus()
+    def createMenus
       @fileMenu = menuBar().addMenu(tr("&File"))
       @fileMenu.addAction(@veAct)
 
@@ -96,8 +111,7 @@ module Eiwaji
       @editMenu.addAction(@settingsAct)
     end
 
-    def createDockWindows()
-
+    def createDockWindows
       @lexer_widget = LexerWidget.new(self)
       addDockWidget(Qt::BottomDockWidgetArea, @lexer_widget)
 
@@ -105,13 +119,34 @@ module Eiwaji
       addDockWidget(Qt::RightDockWidgetArea, @dictionary_widget)
     end
 
-    def openSettings()
+    def openSettings
       settings = Eiwaji::SettingsDialog.new(self)
       settings.exec
-      pp JDict.configuration
+      readConfig
       @dictionary_widget.reset
     end
 
+    def writeConfig
+      config = JDict.configuration
+      @settings ||= Qt::Settings.new(CONFIG_PATH, Qt::Settings::IniFormat)
+      @settings.setValue("num_results", Qt::Variant.new(config.num_results))
+      @settings.setValue("language", Qt::Variant.new(config.language.to_s))
+      @settings.sync
+    end
+
+    def readConfig
+      return unless File.exists? CONFIG_PATH
+      config = JDict.configuration
+      @settings ||= Qt::Settings.new(CONFIG_PATH, Qt::Settings::IniFormat)
+      JDict.reset
+      JDict.configure do |config|
+        config.num_results = @settings.value("num_results").toInt
+        config.language = @settings.value("language").toString.to_sym
+        config.dictionary_path = DICTIONARY_PATH
+        config.index_path = DICTIONARY_PATH
+      end
+    end
+    
   end
   module Underscore
     def underscore
@@ -125,4 +160,10 @@ module Eiwaji
     end
   end
   String.send(:include, Underscore)
+end
+
+# Make the MakeMakefile logger write file output to null.
+# Probably requires ruby >= 1.9.3
+module MakeMakefile::Logging
+  @logfile = File::NULL
 end
