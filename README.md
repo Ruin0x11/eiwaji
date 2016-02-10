@@ -20,11 +20,10 @@ Tested on Ruby 2.2.3 & 2.2.4.
 Does not build on Ruby 2.3.0 because of [this Ruby bug](https://bugs.ruby-lang.org/issues/11962) preventing the compilation of certain C++ extensions. If you install a separate Ruby version, it MUST be compiled with `--enable-shared`, or the application won't run. (If you're using ruby-build, this flag is [not set by default](https://github.com/rbenv/ruby-build/issues/35).)
 
 ## Installation
+Make sure all requirements are installed before installing the gem.
 ```
 gem install eiwaji
-```
-Ensure that mecab and mecab-ipadic are installed before starting the program.
-```
+
 eiwaji
 ```
 
