@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "bin"
   spec.executables   = ["eiwaji"]
-  spec.require_paths = ["lib"]
+  spec.require_paths = ["lib", "dicts"]
 
   spec.add_dependency 've', '~>0.0.3'
   spec.add_dependency 'text', '~>1.3.1'
