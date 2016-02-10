@@ -17,7 +17,7 @@ module Eiwaji
     def initialize(parent = nil)
       super(parent)
 
-      if find_executable('mecab') == nil
+      if find_executable0('mecab') == nil
         Qt::MessageBox.critical(self, tr("Mecab not installed"),
                   tr("An installation of mecab was not detected. " +
                      "Text analysis will not function properly."))
@@ -26,6 +26,7 @@ module Eiwaji
       @ui = Ui_MainWindow.new
       @ui.setupUi(self)
 
+      @settings ||= Qt::Settings.new(Eiwaji::Constants::CONFIG_PATH, Qt::Settings::IniFormat)
       if not File.exists? Eiwaji::Constants::CONFIG_PATH
         writeConfig
       end
@@ -125,7 +126,6 @@ module Eiwaji
 
     def writeConfig
       config = JDict.configuration
-      @settings ||= Qt::Settings.new(Eiwaji::Constants::CONFIG_PATH, Qt::Settings::IniFormat)
       @settings.setValue("num_results", Qt::Variant.new(config.num_results))
       @settings.setValue("language", Qt::Variant.new(config.language.to_s))
       @settings.sync
@@ -133,7 +133,6 @@ module Eiwaji
 
     def readConfig
       return unless File.exists? Eiwaji::Constants::CONFIG_PATH
-      @settings ||= Qt::Settings.new(Eiwaji::Constants::CONFIG_PATH, Qt::Settings::IniFormat)
 
       JDict.reset
       JDict.configure do |config|
@@ -145,18 +144,6 @@ module Eiwaji
     end
     
   end
-  module Underscore
-    def underscore
-      word = self.dup
-      word.gsub!(/::/, '/')
-      word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
-      word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
-      word.tr!("-", "_")
-      word.downcase!
-      word
-    end
-  end
-  String.send(:include, Underscore)
 end
 
 # Make the MakeMakefile logger write file output to null.

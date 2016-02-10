@@ -6,7 +6,7 @@ require_relative 'ui/ui_lexer'
 module Eiwaji
   class LexerWidget < Qt::DockWidget
 
-    POS_IGNORE = [Ve::PartOfSpeech::Symbol] # parts-of-speech to not provide links for
+    POS_IGNORE = [Ve::PartOfSpeech::Symbol] # parts-of-speech to not provide hyperlinks for
     HISTORY_STRING_LENGTH = 30
     MAX_HISTORY_ITEMS = 10
 
@@ -110,27 +110,15 @@ module Eiwaji
       query = word.tokens[0][:lemma]
       query = lemma if query == "*"
 
-      p word
-      p query, lemma
+      if Eiwaji::DEBUG
+        p word, query, lemma
+      end
 
       # search on the query and sort by the results most similar to the lemma
       parent.search(query, lemma)
     end
     
-
-    # def part_of_speech_colors
-    #   @part_of_speech_colors ||= {
-    #                               :verb => "#B58900",
-    #                               :noun => "#93A1A1",
-    #                               :proper_noun => "#268BD2",
-    #                               :symbol => "#839496",
-    #                               :postposition => "#CB4B16",
-    #                               :pronoun => "#D33682",
-    #                               :background => "#002B36",
-    #                               :default => "#839496"
-    #                              }
-    # end
-
+    # each symbol represents the class name of a Ve::PartOfSpeech
     def part_of_speech_colors
       @part_of_speech_colors ||= {
         :verb => "#808080",
@@ -159,5 +147,19 @@ module Eiwaji
         raw = "<a href=\'#{index}\' style='color: #{color}'>" + raw + "</a>"
       end
     end
+
+    # Allow conversion of class names to underscore-delimited strings
+    module Underscore
+        def underscore
+        word = self.dup
+        word.gsub!(/::/, '/')
+        word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+        word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
+        word.tr!("-", "_")
+        word.downcase!
+        word
+        end
+    end
+    String.send(:include, Underscore)
   end
 end
