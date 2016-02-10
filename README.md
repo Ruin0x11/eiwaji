@@ -4,6 +4,11 @@ eiwaji is a Japanese-to-English lexer and dictionary. It uses [mecab](http://tak
 
 <a href="https://raw.githubusercontent.com/Ruin0x11/eiwaji/master/img/linux.png"><img src="https://cloud.githubusercontent.com/assets/6700637/12964930/560a59da-d018-11e5-8d27-a3139da662b1.png" width="15%"></img></a>
 
+## Features
+* Lookup Japanese terms in English or other JMDict languages
+* Separate Japanese text by part-of-speech and click a parsed term to lookup
+* Capture clipboard to automatically analyze copied text
+
 ## Requirements
 * Linux / OSX
 * [libxml-ruby](https://github.com/xml4r/libxml-ruby) requirements (libm, zlib, libiconv, libxml2)
