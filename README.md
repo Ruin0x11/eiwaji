@@ -2,6 +2,8 @@
 
 eiwaji is a Japanese-to-English lexer and dictionary. It uses [mecab](http://taku910.github.io/mecab/) (with help from [ve](https://github.com/Kimtaro/ve)) to analyze Japanese sentences and allows for easy offline lookup of the parsed terms using [JMDict](http://www.edrdg.org/jmdict/j_jmdict.html).
 
+<a href="https://raw.githubusercontent.com/Ruin0x11/eiwaji/master/img/linux.png"><img src="https://cloud.githubusercontent.com/assets/6700637/12964930/560a59da-d018-11e5-8d27-a3139da662b1.png" width="15%"></img></a>
+
 ## Requirements
 * Linux / OSX
 * [libxml-ruby](https://github.com/xml4r/libxml-ruby) requirements (libm, zlib, libiconv, libxml2)
@@ -16,13 +18,13 @@ Does not build on Ruby 2.3.0 because of [this Ruby bug](https://bugs.ruby-lang.o
 ```
 gem install eiwaji
 ```
-Ensure that mecab and mecab-ipadic are installed on program start.
+Ensure that mecab and mecab-ipadic are installed before starting the program.
 ```
 eiwaji
 ```
 
 ## License
-BSD.
+BSD
 
 ## TODO
 * Windows support / install instructions
