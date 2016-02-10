@@ -12,9 +12,6 @@ require_relative 'settings_dialog'
 module Eiwaji
   class MainWindow < Qt::MainWindow
 
-    CONFIG_PATH = "./eiwajirc"
-    DICTIONARY_PATH = "./dicts/"
-
     slots 'lexEditorText()', 'clipboardChanged(QClipboard::Mode)', 'toggleMainTextEditable()', 'openSettings()'
 
     def initialize(parent = nil)
@@ -29,7 +26,7 @@ module Eiwaji
       @ui = Ui_MainWindow.new
       @ui.setupUi(self)
 
-      if not File.exists? CONFIG_PATH
+      if not File.exists? Eiwaji::Constants::CONFIG_PATH
         writeConfig
       end
       readConfig
@@ -128,22 +125,22 @@ module Eiwaji
 
     def writeConfig
       config = JDict.configuration
-      @settings ||= Qt::Settings.new(CONFIG_PATH, Qt::Settings::IniFormat)
+      @settings ||= Qt::Settings.new(Eiwaji::Constants::CONFIG_PATH, Qt::Settings::IniFormat)
       @settings.setValue("num_results", Qt::Variant.new(config.num_results))
       @settings.setValue("language", Qt::Variant.new(config.language.to_s))
       @settings.sync
     end
 
     def readConfig
-      return unless File.exists? CONFIG_PATH
-      config = JDict.configuration
-      @settings ||= Qt::Settings.new(CONFIG_PATH, Qt::Settings::IniFormat)
+      return unless File.exists? Eiwaji::Constants::CONFIG_PATH
+      @settings ||= Qt::Settings.new(Eiwaji::Constants::CONFIG_PATH, Qt::Settings::IniFormat)
+
       JDict.reset
       JDict.configure do |config|
         config.num_results = @settings.value("num_results").toInt
         config.language = @settings.value("language").toString.to_sym
-        config.dictionary_path = DICTIONARY_PATH
-        config.index_path = DICTIONARY_PATH
+        config.dictionary_path = Eiwaji::Constants::DICTIONARY_PATH
+        config.index_path = Eiwaji::Constants::DICTIONARY_PATH
       end
     end
     

@@ -14,7 +14,7 @@ module Eiwaji
       @ui = Ui_DictionaryWidget.new
       @ui.setupUi(self)
 
-      if not File.exists? File.join(JDict.configuration.index_path, "fts5.db")
+      if not File.exists? Eiwaji::Constants::INDEX_FILE
         Qt::MessageBox.information(self, tr("No Index"),
                     tr("No index file detected. Please wait while the index is built."))
       end

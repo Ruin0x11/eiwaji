@@ -1,5 +1,4 @@
 require 'jdict'
-require 'constants'
 
 require_relative 'ui/ui_settings'
 
@@ -15,7 +14,7 @@ module Eiwaji
 
       @parent = parent
 
-      @settings ||= Qt::Settings.new(MainWindow::CONFIG_PATH, Qt::Settings::IniFormat)
+      @settings ||= Qt::Settings.new(Eiwaji::Constants::CONFIG_PATH, Qt::Settings::IniFormat)
 
       okButton = @ui.buttonBox.button(Qt::DialogButtonBox::Ok)
       closeButton = @ui.buttonBox.button(Qt::DialogButtonBox::Cancel)
@@ -60,9 +59,8 @@ module Eiwaji
     end
 
     def rebuildIndex()
-      config_file = File.join(JDict.configuration.index_path, "fts5.db")
-      if File.exists? config_file
-        File.unlink(config_file)
+      if File.exists? Eiwaji::Constants::INDEX_FILE
+        File.unlink(Eiwaji::Constants::INDEX_FILE)
       end
       Qt::MessageBox.information(self, tr("Rebuilding Index"),
                                  tr("Please wait while the index is rebuilt."))
