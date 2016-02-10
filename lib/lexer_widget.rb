@@ -8,7 +8,7 @@ module Eiwaji
 
     POS_IGNORE = [Ve::PartOfSpeech::Symbol] # parts-of-speech to not provide hyperlinks for
     HISTORY_STRING_LENGTH = 30
-    MAX_HISTORY_ITEMS = 10
+    MAX_HISTORY_ITEMS = 50
 
     slots 'wordClicked(QUrl)', 'historyItemChanged(int)', 'historyPrev()', 'historyNext()'
 

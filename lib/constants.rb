@@ -1,3 +1,5 @@
+require_relative 'eiwaji/version'
+
 module Eiwaji
   module Constants
 

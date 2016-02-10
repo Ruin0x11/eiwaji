@@ -48,7 +48,6 @@ module Eiwaji
       end
       @ui.dictLanguageBox.currentIndex = index
 
-      @ui.maxHistoryEntriesBox.value = 50
       @ui.maxResultsBox.value = JDict.configuration.num_results
     end
 
