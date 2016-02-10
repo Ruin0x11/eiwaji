@@ -83,13 +83,24 @@ module Eiwaji
         @ui.historyBox.removeItem(MAX_HISTORY_ITEMS+1) if @ui.historyBox.count > MAX_HISTORY_ITEMS+1
       end
 
-      words = Ve.in(:ja).words(text)
-
+      lines = text.split("\n")
+      html_lines = []
       @lexer_results = Hash.new
-      words.map.with_index {|word, i| @lexer_results[i] = word }
+      i = 0
 
-      # associate search result indexes with HTML links
-      html = words.map.with_index {|word, i| text = wordToHtml(word, i)}.join(' ')
+      lines.each do |line|
+        words = Ve.in(:ja).words(line)
+        html_words = []
+
+        words.each do |word|
+          @lexer_results[i] = word
+          html_words << wordToHtml(word, i)
+          i = i + 1
+        end
+        html_lines << "<div style='margin-bottom: 20px'>" + html_words.join(' ') + "<\div>"
+      end
+
+      html = html_lines.join("")
 
       @ui.lexerTextBrowser.setText(html)
     end
