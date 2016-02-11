@@ -3,6 +3,7 @@
 eiwaji is a Japanese-to-English lexer and dictionary. It uses [mecab](http://taku910.github.io/mecab/) (with help from [ve](https://github.com/Kimtaro/ve)) to analyze Japanese sentences and allows for easy offline lookup of the parsed terms using [JMDict](http://www.edrdg.org/jmdict/j_jmdict.html).
 
 <a href="https://raw.githubusercontent.com/Ruin0x11/eiwaji/master/img/linux.png"><img src="https://cloud.githubusercontent.com/assets/6700637/12964930/560a59da-d018-11e5-8d27-a3139da662b1.png" width="15%"></img></a>
+<a href="https://raw.githubusercontent.com/Ruin0x11/eiwaji/master/img/win8.png"><img src="https://cloud.githubusercontent.com/assets/6700637/12967587/c9ca8a4c-d02d-11e5-9e44-6e3ae6061ec5.PNG" width="15%"></img></a>
 
 ## Features
 * Lookup Japanese terms in English or other JMDict languages
