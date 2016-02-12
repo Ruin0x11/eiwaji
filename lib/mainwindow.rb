@@ -36,6 +36,7 @@ module Eiwaji
       createActions()
       createMenus()
       createStatusBar()
+      createToolBars()
       createDockWindows()
 
       setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }")
@@ -85,8 +86,15 @@ module Eiwaji
       statusBar().showMessage(tr("Ready"))
     end
 
+    def showStatusMessage(str)
+      puts str
+      puts str.force_encoding("UTF-8")
+      statusBar().showMessage(str.force_encoding("UTF-8"))
+    end
+
     def createActions
       @veAct = Qt::Action.new(tr("&Analyze Text"), self)
+      @veAct.shortcut = Qt::KeySequence.new( tr("Ctrl+E"))
       @veAct.statusTip = tr("Send the text in the editor to the lexer widget.")
       connect(@veAct, SIGNAL('triggered()'), self, SLOT('lexEditorText()'))
 
@@ -109,12 +117,17 @@ module Eiwaji
       @editMenu.addAction(@settingsAct)
     end
 
+    def createToolBars
+      @fileToolBar = addToolBar(tr("File"))
+      @fileToolBar.addAction(@veAct)
+    end
+
     def createDockWindows
       @lexer_widget = LexerWidget.new(self)
       addDockWidget(Qt::BottomDockWidgetArea, @lexer_widget)
 
       @dictionary_widget = DictionaryWidget.new(self)
-      addDockWidget(Qt::RightDockWidgetArea, @dictionary_widget)
+      addDockWidget(Qt::BottomDockWidgetArea, @dictionary_widget)
     end
 
     def openSettings

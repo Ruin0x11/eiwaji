@@ -14,6 +14,8 @@ module Eiwaji
 
     def initialize(parent)
       super(parent)
+
+      @parent = parent
       
       @ui = Ui_LexerWidget.new
       @ui.setupUi(self)
@@ -121,6 +123,20 @@ module Eiwaji
       query = word.tokens[0][:lemma]
       query = lemma if query == "*"
 
+      status = ""
+
+      if word.word == query || lemma == "" then
+        status = word.word
+      elsif query == lemma then
+        status = word.word + " -> " + query
+      else
+        status = word.word + " -> " + lemma + " -> " + query
+      end
+
+      status = status + " (" + word.part_of_speech.name + ")"
+
+      @parent.showStatusMessage(status)
+
       if Eiwaji::DEBUG
         p word, query, lemma
       end
@@ -132,17 +148,21 @@ module Eiwaji
     # each symbol represents the class name of a Ve::PartOfSpeech
     def part_of_speech_colors
       @part_of_speech_colors ||= {
-        :verb => "#808080",
-        :noun => "#000000",
-        :proper_noun => "#0000FF",
-        :symbol => "#000000",
+        :verb         => "#808080",
+        :noun         => "#000000",
+        :propernoun   => "#000000",
+        :symbol       => "#000000",
         :postposition => "#FF0000",
-        :pronoun => "#008080",
-        :adjective => "#008000",
-        :adverb => "#43C6DB",
-        :conjunction => "#FFA500",
-        :background => "#FFFFFF",
-        :default => "#FF00FF"
+        :pronoun      => "#000000",
+        :adjective    => "#000000",
+        :adverb       => "#000000",
+        :conjunction  => "#000000",
+        :determiner   => "#000000",
+        :background   => "#FFFFFF",
+        :number       => "#000000",
+        :prefix       => "#000000",
+        :suffix       => "#000000",
+        :default      => "#FF00FF"
       }
     end
 
@@ -150,7 +170,7 @@ module Eiwaji
     def wordToHtml(word, index)
       raw = word.word
       pos = word.part_of_speech
-      color = @part_of_speech_colors[pos.name.gsub(' ', '_').underscore.to_sym] || @part_of_speech_colors[:default]
+      color = @part_of_speech_colors[pos.name.downcase.to_sym] || @part_of_speech_colors[:default]
       
       if POS_IGNORE.include? pos
         raw = "<font style='color: #{color}'>" + raw + "</font>"
@@ -158,19 +178,5 @@ module Eiwaji
         raw = "<a href=\'#{index}\' style='color: #{color}'>" + raw + "</a>"
       end
     end
-
-    # Allow conversion of class names to underscore-delimited strings
-    module Underscore
-        def underscore
-        word = self.dup
-        word.gsub!(/::/, '/')
-        word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
-        word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
-        word.tr!("-", "_")
-        word.downcase!
-        word
-        end
-    end
-    String.send(:include, Underscore)
   end
 end

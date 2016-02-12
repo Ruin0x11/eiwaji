@@ -1,8 +1,8 @@
 =begin
 ** Form generated from reading ui file 'lexer.ui'
 **
-** Created: 土 12 12 17:52:38 2015
-**      by: Qt User Interface Compiler version 4.8.6
+** Created: 木 2月 11 21:45:32 2016
+**      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 =end
@@ -21,8 +21,13 @@ class Ui_LexerWidget
     if lexerWidget.objectName.nil?
         lexerWidget.objectName = "lexerWidget"
     end
-    lexerWidget.resize(400, 300)
-    lexerWidget.minimumSize = Qt::Size.new(266, 200)
+    lexerWidget.resize(500, 500)
+    @sizePolicy = Qt::SizePolicy.new(Qt::SizePolicy::Preferred, Qt::SizePolicy::Preferred)
+    @sizePolicy.setHorizontalStretch(0)
+    @sizePolicy.setVerticalStretch(0)
+    @sizePolicy.heightForWidth = lexerWidget.sizePolicy.hasHeightForWidth
+    lexerWidget.sizePolicy = @sizePolicy
+    lexerWidget.minimumSize = Qt::Size.new(420, 400)
     lexerWidget.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
     lexerWidget.allowedAreas = Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
     @dockWidgetContents = Qt::Widget.new(lexerWidget)

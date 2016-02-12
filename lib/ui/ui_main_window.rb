@@ -1,7 +1,7 @@
 =begin
 ** Form generated from reading ui file 'main_window.ui'
 **
-** Created: 土 12月 12 17:06:01 2015
+** Created: 木 2月 11 22:59:24 2016
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
@@ -37,10 +37,12 @@ class Ui_MainWindow
     @verticalLayout.objectName = "verticalLayout"
     @bigEditor = Qt::TextBrowser.new(@centralwidget)
     @bigEditor.objectName = "bigEditor"
+    @bigEditor.minimumSize = Qt::Size.new(50, 50)
     @font = Qt::Font.new
-    @font.pointSize = 12
+    @font.pointSize = 14
     @bigEditor.font = @font
     @bigEditor.readOnly = false
+    @bigEditor.acceptRichText = false
 
     @verticalLayout.addWidget(@bigEditor)
 
@@ -50,7 +52,7 @@ class Ui_MainWindow
     mainWindow.centralWidget = @centralwidget
     @menubar = Qt::MenuBar.new(mainWindow)
     @menubar.objectName = "menubar"
-    @menubar.geometry = Qt::Rect.new(0, 0, 800, 19)
+    @menubar.geometry = Qt::Rect.new(0, 0, 800, 16)
     mainWindow.setMenuBar(@menubar)
     @statusbar = Qt::StatusBar.new(mainWindow)
     @statusbar.objectName = "statusbar"

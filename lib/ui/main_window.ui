@@ -19,12 +19,21 @@
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QTextBrowser" name="bigEditor">
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>50</height>
+         </size>
+        </property>
         <property name="font">
          <font>
-          <pointsize>12</pointsize>
+          <pointsize>14</pointsize>
          </font>
         </property>
         <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="acceptRichText">
          <bool>false</bool>
         </property>
        </widget>
@@ -39,7 +48,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>19</height>
+     <height>16</height>
     </rect>
    </property>
   </widget>

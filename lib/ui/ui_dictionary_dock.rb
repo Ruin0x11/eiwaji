@@ -1,8 +1,8 @@
 =begin
 ** Form generated from reading ui file 'dictionary_dock.ui'
 **
-** Created: 土 12 12 17:57:15 2015
-**      by: Qt User Interface Compiler version 4.8.6
+** Created: 木 2月 11 21:45:32 2016
+**      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 =end
@@ -23,9 +23,14 @@ class Ui_DictionaryWidget
         dictionaryWidget.objectName = "dictionaryWidget"
     end
     dictionaryWidget.resize(500, 500)
+    @sizePolicy = Qt::SizePolicy.new(Qt::SizePolicy::Preferred, Qt::SizePolicy::Preferred)
+    @sizePolicy.setHorizontalStretch(0)
+    @sizePolicy.setVerticalStretch(0)
+    @sizePolicy.heightForWidth = dictionaryWidget.sizePolicy.hasHeightForWidth
+    dictionaryWidget.sizePolicy = @sizePolicy
     dictionaryWidget.minimumSize = Qt::Size.new(420, 400)
     dictionaryWidget.features = Qt::DockWidget::DockWidgetFloatable|Qt::DockWidget::DockWidgetMovable
-    dictionaryWidget.allowedAreas = Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea
+    dictionaryWidget.allowedAreas = Qt::AllDockWidgetAreas
     @dockWidgetContents = Qt::Widget.new(dictionaryWidget)
     @dockWidgetContents.objectName = "dockWidgetContents"
     @verticalLayout_2 = Qt::VBoxLayout.new(@dockWidgetContents)
@@ -34,7 +39,7 @@ class Ui_DictionaryWidget
     @searchBox = Qt::LineEdit.new(@dockWidgetContents)
     @searchBox.objectName = "searchBox"
     @font = Qt::Font.new
-    @font.pointSize = 11
+    @font.pointSize = 16
     @searchBox.font = @font
 
     @verticalLayout_2.addWidget(@searchBox)

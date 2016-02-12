@@ -7,6 +7,11 @@ module Eiwaji
   class DictionaryWidget < Qt::DockWidget
 
     slots 'updateSortIndex(int)', 'getWordDetailsAtIndex(QModelIndex)', 'queryEntered()', 'getWordDetails()'
+
+    KANJI_COLUMN =      0
+    KANA_COLUMN  =      1
+    SENSE_COLUMN =      2
+    SIMILARITY_COLUMN = 3
     
     def initialize(parent)
       super(parent)
@@ -47,11 +52,11 @@ module Eiwaji
 
     # retrieve word data from a row of the search results model
     def getWordDetails(row)
-      resultIndex = @ui.searchResults.model.index(row, 0)
+      resultIndex = @ui.searchResults.model.index(row, KANJI_COLUMN)
       kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
-      resultIndex = @ui.searchResults.model.index(row, 1)
+      resultIndex = @ui.searchResults.model.index(row, KANA_COLUMN)
       kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
-      resultIndex = @ui.searchResults.model.index(row, 2)
+      resultIndex = @ui.searchResults.model.index(row, SENSE_COLUMN)
       sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
       kanji = (kanji.nil? ? "" : kanji)
       kana = (kana.nil? ? "" : kana)
@@ -73,10 +78,10 @@ module Eiwaji
       connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
       @ui.searchResults.horizontalHeader.setVisible(true)
       @ui.searchResults.verticalHeader.setVisible(false)
+      @ui.searchResults.horizontalHeader.resizeSection(SENSE_COLUMN, 200)
 
-      
       # sort by similarity
-      updateSortIndex(3)
+      updateSortIndex(SIMILARITY_COLUMN)
 
       if results.size > 0
         getWordDetails(0)
