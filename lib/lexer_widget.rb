@@ -127,7 +127,7 @@ module Eiwaji
 
       if word.word == query || lemma == "" then
         status = word.word
-      elsif query == lemma then
+      elsif word.word == lemma || query == lemma then
         status = word.word + " -> " + query
       else
         status = word.word + " -> " + lemma + " -> " + query
