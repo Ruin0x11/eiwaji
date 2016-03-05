@@ -5,33 +5,34 @@ module Eiwaji
       @white = Text::WhiteSimilarity.new
       @entries = entries
       @lemma = lemma
-      calcSimilarityForAll
+      calc_all_similarities
     end
 
-    def calcSimilarityForAll
+    def calc_all_similarities
       @sim = Array.new(@entries.size)
       @entries.each_with_index do |entry, i|
         similarity = 0.0
-        # if there are multiple kana/kanji readings, get the highest similarity out of each
+        # if there are multiple kana/kanji readings,
+        #get the highest similarity out of each
         unless entry.kana.nil?
-          if entry.kana.kind_of?(Array)
+          if entry.kana.is_a?(Array)
             similarity += entry.kana.inject(0.0) do |max, k|
-              sim = calcSimilarity(k)
+              sim = calc_similarity(k)
               [max, sim].max
             end
           else
-            similarity += calcSimilarity(entry.kana)
+            similarity += calc_similarity(entry.kana)
           end
         end
 
         unless entry.kanji.nil?
-          if entry.kanji.kind_of?(Array)
+          if entry.kanji.is_a?(Array)
             similarity += entry.kanji.inject(0.0) do |max, k|
-              sim = calcSimilarity(k)
+              sim = calc_similarity(k)
               [max, sim].max
             end
           else
-            similarity += calcSimilarity(entry.kanji)
+            similarity += calc_similarity(entry.kanji)
           end
         end
         @sim[i] = similarity
@@ -43,18 +44,15 @@ module Eiwaji
     end
 
     def rowCount(parent)
-      if parent.valid?
-        return 0
-      else
-        return @entries.size
-      end
+      return 0 if parent.valid?
+      @entries.size
     end
 
     def flags(index)
       Qt::ItemIsSelectable | Qt::ItemIsEnabled
     end
 
-    def data(index, role=Qt::DisplayRole)
+    def data(index, role = Qt::DisplayRole)
       invalid = Qt::Variant.new
       return invalid unless role == Qt::DisplayRole
       return invalid if @entries.empty?
@@ -63,56 +61,54 @@ module Eiwaji
       entry = @entries[index.row]
 
       v = case index.column
-          when 0 # kanji
-            if not entry.kanji.empty?
-              if entry.kanji.kind_of?(Array)
-                entry.kanji.map {|k| k.force_encoding("UTF-8") }.join(', ')
+          when Eiwaji::Constants::KANJI_COLUMN
+            unless entry.kanji.empty?
+              if entry.kanji.is_a?(Array)
+                entry.kanji.join(', ')
               else
-                entry.kanji.force_encoding("UTF-8")
+                entry.kanji
               end
             end
-          when 1 # kana
-            entry.kana.map {|k| k.force_encoding("UTF-8") }.join(', ') unless entry.kana.nil?
-          when 2 # sense
+          when Eiwaji::Constants::KANA_COLUMN
+            entry.kana.join(', ') unless entry.kana.nil?
+          when Eiwaji::Constants::SENSE_COLUMN
             if entry.senses.size > 1
-              sense = entry.senses.map.with_index(1) do |s, i|
-                pos = s.parts_of_speech.nil? ? "" : "(" + s.parts_of_speech.join(", ") + ") "
-                glosses = s.glosses.join(", ")
+              sense = entry.senses.map.with_index(1) do |s, _|
+                pos = s.parts_of_speech.nil? ? '' : '(' + s.parts_of_speech.join(', ') + ') '
+                glosses = s.glosses.join(', ')
                 pos + glosses
               end
               sense.reverse.join(" \n ")
             else
               s = entry.senses.first
-              pos = s.parts_of_speech.nil? ? "" : "(" + s.parts_of_speech.join(", ") + ") "
-              glosses = s.glosses.join(", ")
+              pos = s.parts_of_speech.nil? ? '' : '(' + s.parts_of_speech.join(', ') + ') '
+              glosses = s.glosses.join(', ')
               pos + glosses
             end
-          when 3 # similarity
+          when Eiwaji::Constants::SIMILARITY_COLUMN
             @sim[index.row]
-          else 
+          else
             raise "invalid column #{index.column}"
-          end || ""
-      return Qt::Variant.new(v)
+          end || ''
+      Qt::Variant.new(v)
     end
 
-    def calcSimilarity(word)
-      w = word.force_encoding("UTF-8")
-      sim = @white.similarity(@lemma, w) 
-      if sim.nan?
-        sim = (@lemma == w ? 1.0 : 0.0)
-      end
+    def calc_similarity(word)
+      w = word.force_encoding('UTF-8')
+      sim = @white.similarity(@lemma, w)
+      sim = (@lemma == w ? 1.0 : 0.0) if sim.nan?
       sim
     end
-    
-    def headerData(section, orientation, role=Qt::DisplayRole)
+
+    def headerData(section, orientation, role = Qt::DisplayRole)
       return Qt::Variant.new if role != Qt::DisplayRole
       v = case orientation
           when Qt::Horizontal
-            ["Kanji","Kana","Meaning","Similarity"][section]
+            %w(Kanji Kana Meaning Similarity)[section]
           else
             section.to_s
           end
-      return Qt::Variant.new(v)
+      Qt::Variant.new(v)
     end
   end
 end

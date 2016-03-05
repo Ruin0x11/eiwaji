@@ -5,86 +5,92 @@ require_relative 'dictionary_model'
 
 module Eiwaji
   class DictionaryWidget < Qt::DockWidget
+    slots 'update_sort_index(int)', 'get_word_details_at(QModelIndex)',
+          'query_entered()', 'get_word_details()'
 
-    slots 'updateSortIndex(int)', 'getWordDetailsAtIndex(QModelIndex)', 'queryEntered()', 'getWordDetails()'
-
-    KANJI_COLUMN =      0
-    KANA_COLUMN  =      1
-    SENSE_COLUMN =      2
-    SIMILARITY_COLUMN = 3
-    
     def initialize(parent)
       super(parent)
 
       @ui = Ui_DictionaryWidget.new
       @ui.setupUi(self)
 
-      if not File.exists? Eiwaji::Constants::INDEX_FILE
-        Qt::MessageBox.information(self, tr("No Index"),
-                    tr("No index file detected. Please wait while the index is built."))
+      unless File.exist? Eiwaji::Constants::INDEX_FILE
+        Qt::MessageBox.information(self, tr('No Index'),
+                                   tr('No index file detected. Please' \
+                                      'wait while the index is built.'))
       end
 
-      reset()
-      @white = Text::WhiteSimilarity.new
-      connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
-      connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
+      reset
 
-      connect(@ui.searchBox, SIGNAL('returnPressed()'), self, SLOT('queryEntered()'))
+      @white = Text::WhiteSimilarity.new
+      connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'),
+              self, SLOT('get_word_details_at(QModelIndex)'))
+      connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'),
+              self, SLOT('get_word_details_at(QModelIndex)'))
+      connect(@ui.searchBox, SIGNAL('returnPressed()'),
+              self, SLOT('query_entered()'))
     end
 
     def reset
-      @dict = JDict::JMDict.new()
+      @dict = JDict::JMDict.new
     end
 
-    def queryEntered
-      query = @ui.searchBox.text.force_encoding("UTF-8")
+    def query_entered
+      query = @ui.searchBox.text.force_encoding('UTF-8')
       search(query)
     end
 
-    def updateSortIndex(index)
+    def update_sort_index(index)
       @ui.searchResults.sortByColumn(index)
     end
 
-    def getWordDetailsAtIndex(index)
+    def get_word_details_at(index)
       row = index.row
-      getWordDetails(row)
+      get_word_details(row)
     end
 
     # retrieve word data from a row of the search results model
-    def getWordDetails(row)
-      resultIndex = @ui.searchResults.model.index(row, KANJI_COLUMN)
-      kanji = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
-      resultIndex = @ui.searchResults.model.index(row, KANA_COLUMN)
-      kana = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
-      resultIndex = @ui.searchResults.model.index(row, SENSE_COLUMN)
-      sense = @ui.searchResults.model.data(resultIndex, Qt::DisplayRole).value
-      kanji = (kanji.nil? ? "" : kanji)
-      kana = (kana.nil? ? "" : kana)
-      sense = (sense.nil? ? "" : sense)
-      @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense)
+    def get_word_details(row)
+      result_index = @ui.searchResults.model.index(row, Eiwaji::Constants::KANJI_COLUMN)
+      kanji = @ui.searchResults.model.data(result_index, Qt::DisplayRole).value
+
+      result_index = @ui.searchResults.model.index(row, Eiwaji::Constants::KANA_COLUMN)
+      kana = @ui.searchResults.model.data(result_index, Qt::DisplayRole).value
+
+      result_index = @ui.searchResults.model.index(row, Eiwaji::Constants::SENSE_COLUMN)
+      sense = @ui.searchResults.model.data(result_index, Qt::DisplayRole).value
+
+      kanji = '' if kanji.nil?
+      kana = '' if kana.nil?
+      sense = '' if sense.nil?
+      @ui.wordDetails.setText('Kanji: ' + kanji + "\nKana: " + kana +
+                              "\nSense: " + sense)
     end
 
-    # searches the JDict::JMDict for the given query, and sorts results by similarity to the provided lemma
+    # searches the JDict::JMDict for the given query,
+    # and sorts results by similarity to the provided lemma
     def search(query, lemma = nil)
       lemma ||= query
 
       @ui.searchBox.setText(query)
-      
+
       results = @dict.search(query)
 
       @ui.searchResults.model = Qt::SortFilterProxyModel.new(@ui.searchResults)
-      @ui.searchResults.model.source_model = DictionaryTableModel.new(self, results, lemma)
+      @ui.searchResults.model.source_model =
+        DictionaryTableModel.new(self, results, lemma)
 
-      connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'), self, SLOT('updateSortIndex(int)'))
+      connect(@ui.searchResults.horizontalHeader, SIGNAL('sectionClicked(int)'),
+              self, SLOT('update_sort_index(int)'))
       @ui.searchResults.horizontalHeader.setVisible(true)
       @ui.searchResults.verticalHeader.setVisible(false)
-      @ui.searchResults.horizontalHeader.resizeSection(SENSE_COLUMN, 200)
+      @ui.searchResults.horizontalHeader.resizeSection(Eiwaji::Constants::SENSE_COLUMN, 200)
 
       # sort by similarity
-      updateSortIndex(SIMILARITY_COLUMN)
+      update_sort_index(Eiwaji::Constants::SIMILARITY_COLUMN)
 
-      if results.size > 0
-        getWordDetails(0)
+      if results.empty?
+        get_word_details(0)
       else
         @ui.wordDetails.clear
       end
