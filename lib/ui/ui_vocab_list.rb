@@ -1,61 +1,61 @@
 =begin
 ** Form generated from reading ui file 'vocab_list.ui'
 **
-** Created: 金 3月 4 20:06:04 2016
+** Created: 土 3月 5 23:13:26 2016
 **      by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling ui file!
 =end
 
-class Ui_DockWidget
+class Ui_VocabListWidget
     attr_reader :dockWidgetContents
     attr_reader :verticalLayout_2
     attr_reader :verticalLayout
-    attr_reader :listWidget
+    attr_reader :vocabList
 
-    def setupUi(dockWidget)
-    if dockWidget.objectName.nil?
-        dockWidget.objectName = "dockWidget"
+    def setupUi(vocabListWidget)
+    if vocabListWidget.objectName.nil?
+        vocabListWidget.objectName = "vocabListWidget"
     end
-    dockWidget.resize(400, 300)
-    @dockWidgetContents = Qt::Widget.new(dockWidget)
+    vocabListWidget.resize(400, 300)
+    @dockWidgetContents = Qt::Widget.new(vocabListWidget)
     @dockWidgetContents.objectName = "dockWidgetContents"
     @verticalLayout_2 = Qt::VBoxLayout.new(@dockWidgetContents)
     @verticalLayout_2.objectName = "verticalLayout_2"
     @verticalLayout_2.setContentsMargins(0, 0, 0, 0)
     @verticalLayout = Qt::VBoxLayout.new()
     @verticalLayout.objectName = "verticalLayout"
-    @listWidget = Qt::ListWidget.new(@dockWidgetContents)
-    @listWidget.objectName = "listWidget"
+    @vocabList = Qt::TreeView.new(@dockWidgetContents)
+    @vocabList.objectName = "vocabList"
 
-    @verticalLayout.addWidget(@listWidget)
+    @verticalLayout.addWidget(@vocabList)
 
 
     @verticalLayout_2.addLayout(@verticalLayout)
 
-    dockWidget.setWidget(@dockWidgetContents)
+    vocabListWidget.setWidget(@dockWidgetContents)
 
-    retranslateUi(dockWidget)
+    retranslateUi(vocabListWidget)
 
-    Qt::MetaObject.connectSlotsByName(dockWidget)
+    Qt::MetaObject.connectSlotsByName(vocabListWidget)
     end # setupUi
 
-    def setup_ui(dockWidget)
-        setupUi(dockWidget)
+    def setup_ui(vocabListWidget)
+        setupUi(vocabListWidget)
     end
 
-    def retranslateUi(dockWidget)
-    dockWidget.windowTitle = Qt::Application.translate("DockWidget", "DockWidget", nil, Qt::Application::UnicodeUTF8)
+    def retranslateUi(vocabListWidget)
+    vocabListWidget.windowTitle = Qt::Application.translate("VocabListWidget", "DockWidget", nil, Qt::Application::UnicodeUTF8)
     end # retranslateUi
 
-    def retranslate_ui(dockWidget)
-        retranslateUi(dockWidget)
+    def retranslate_ui(vocabListWidget)
+        retranslateUi(vocabListWidget)
     end
 
 end
 
 module Ui
-    class DockWidget < Ui_DockWidget
+    class VocabListWidget < Ui_VocabListWidget
     end
 end  # module Ui
 

@@ -1,37 +1,25 @@
 module Eiwaji
-  class VocabListModel < Qt::AbstractListModel
-    def initialize(parent)
+  class VocabListModel < Qt::AbstractItemModel
+    def initialize(parent, entries)
       super(parent)
-
-      @parent = parent
-
-      @entries = {}
+      @entries = entries
     end
 
-    def read_vocab_list_file(filename)
-      @entries = {}
-      to_read = File.open(filename, 'r+')
-      to_read.each do |line|
-        seq, votes, date = line.split(':')
-        entry = @parent.search("seq:#{seq}")[0]
-        @entries[seq] = VocabListEntry.new(entry, votes, date)
-      end
+    def flags(index)
+      Qt::ItemIsSelectable | Qt::ItemIsEnabled
     end
 
-    def write_vocab_list_file(filename)
-      to_write = File.open(filename, 'w+')
-      @entries.each do |_, entry|
-        to_write.puts(entry.to_index)
-      end
-      to_write.close
+    def index(row, column, parent)
+      return Qt::ModelIndex.new if !hasIndex(row, column, parent)
+      createIndex(row, column, 0)
     end
 
-    def add_or_upvote_entry(entry)
-      if @entries.key?(entry.sequence_number)
-        @entries[entry.sequence_number].votes += 1
-      else
-        @entries[entry.sequence_number] = VocabListEntry.new(entry)
-      end
+    def parent
+      Qt::ModelIndex.new
+    end
+
+    def hasChildren(parent)
+      return (rowCount(parent) > 0) && (columnCount(parent) > 0) if !parent.isValid
     end
 
     def data(index, role = Qt::DisplayRole)
@@ -52,38 +40,32 @@ module Eiwaji
               end
             end
           when 1
-            entry.votes
+            entry.votes.to_s
           else
             raise "invalid column #{index.column}"
           end || ''
       Qt::Variant.new(v)
     end
 
-    def columnCount
+    def columnCount(parent)
+      return 0 if parent.valid?
       2
     end
     
-
-    def rowCount
+    def rowCount(parent)
+      return 0 if parent.valid?
       @entries.size
     end
-  end
 
-  class VocabListEntry < JDict::Entry
-    attr_accessor :votes, :date_added
-
-    def initalize(entry, votes, date_added)
-      super(entry.sequence_number, entry.kanji, entry.kana, entry.senses)
-      self.votes = votes
-      self.date_added = date_added
-    end
-
-    def initialize(entry)
-      super(entry, 1, Time.now)
-    end
-
-    def to_index
-      "#{sequence_number}:#{votes}:#{date_added.strftime('%s')}"
+    def headerData(section, orientation, role = Qt::DisplayRole)
+      return Qt::Variant.new if role != Qt::DisplayRole
+      v = case orientation
+          when Qt::Horizontal
+            %w(Kanji Votes)[section]
+          else
+            section.to_s
+          end
+      Qt::Variant.new(v)
     end
   end
 end

@@ -94,6 +94,7 @@ module Eiwaji
       else
         @ui.wordDetails.clear
       end
+      # results
     end
   end
 end

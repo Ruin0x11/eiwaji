@@ -8,6 +8,7 @@ require_relative 'tableview'
 require_relative 'lexer_widget'
 require_relative 'dictionary_widget'
 require_relative 'settings_dialog'
+require_relative 'vocab_list_widget'
 
 module Eiwaji
   class MainWindow < Qt::MainWindow
