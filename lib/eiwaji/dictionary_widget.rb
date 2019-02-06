@@ -1,7 +1,4 @@
-require 'jdict'
-
-require_relative 'ui/ui_dictionary_dock'
-require_relative 'dictionary_model'
+require 'ruby-jdict'
 
 module Eiwaji
   class DictionaryWidget < Qt::DockWidget
@@ -12,19 +9,17 @@ module Eiwaji
     KANA_COLUMN  =      1
     SENSE_COLUMN =      2
     SIMILARITY_COLUMN = 3
-    
+
     def initialize(parent)
       super(parent)
+
+      @settings ||= Qt::Settings.new(Eiwaji::Constants::CONFIG_PATH, Qt::Settings::IniFormat)
 
       @ui = Ui_DictionaryWidget.new
       @ui.setupUi(self)
 
-      if not File.exists? Eiwaji::Constants::INDEX_FILE
-        Qt::MessageBox.information(self, tr("No Index"),
-                    tr("No index file detected. Please wait while the index is built."))
-      end
+      load_dictionary
 
-      reset()
       @white = Text::WhiteSimilarity.new
       connect(@ui.searchResults, SIGNAL('activated(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
       connect(@ui.searchResults, SIGNAL('clicked(QModelIndex)'), self, SLOT('getWordDetailsAtIndex(QModelIndex)'))
@@ -33,7 +28,38 @@ module Eiwaji
     end
 
     def reset
-      @dict = JDict::JMDict.new()
+      @dict.delete! if @dict
+    end
+
+    def load_dictionary
+      unless File.exists? Eiwaji::Constants::DICTIONARY_PATH
+        Qt::MessageBox.critical(self, tr("No Index"), tr("No dictionary was found at #{Eiwaji::Constants::DICTIONARY_PATH}"))
+        return false
+      end
+
+      @dict = JDict::Dictionary.new(Eiwaji::Constants::DICTIONARY_PATH)
+
+      if not @dict.loaded?
+        Qt::MessageBox.information(self, tr("No Index"),
+                    tr("No index file detected. Please wait while the index is built."))
+
+        progress_dialog = Qt::ProgressDialog.new(self)
+        progress_dialog.windowTitle = tr("Rebuilding Index")
+        progress_dialog.labelText = tr("Rebuilding index...")
+        progress_dialog.show
+        progress_dialog.raise
+
+        @dict.build_index! do |entries, total|
+          progress_dialog.value = entries
+          progress_dialog.maximum = total
+        end
+
+        progress_dialog.hide
+      end
+
+      @settings.sync
+
+      true
     end
 
     def queryEntered
@@ -61,16 +87,22 @@ module Eiwaji
       kanji = (kanji.nil? ? "" : kanji)
       kana = (kana.nil? ? "" : kana)
       sense = (sense.nil? ? "" : sense)
-      @ui.wordDetails.setText("Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense)
+      text = "Kanji: " + kanji + "\nKana: " + kana + "\nSense: " + sense
+      @ui.wordDetails.setText(text.force_encoding("UTF-8"))
     end
 
-    # searches the JDict::JMDict for the given query, and sorts results by similarity to the provided lemma
+    # searches the JDict::Dictionary for the given query, and sorts results by similarity to the provided lemma
     def search(query, lemma = nil)
+      load_dictionary if not @dict
+
       lemma ||= query
 
       @ui.searchBox.setText(query)
-      
-      results = @dict.search(query)
+
+      language = @settings.value("language").toString.to_sym
+      max_results = @settings.value("num_results").toString.to_sym
+
+      results = @dict.search(query, language: language, max_results: max_results)
 
       @ui.searchResults.model = Qt::SortFilterProxyModel.new(@ui.searchResults)
       @ui.searchResults.model.source_model = DictionaryTableModel.new(self, results, lemma)

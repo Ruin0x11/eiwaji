@@ -2,18 +2,18 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'Qt'
-require_relative 'mainwindow'
-require_relative 'ui/ui_main_window'
-require_relative 'constants'
 
-module Eiwaji
-  class EiwajiApp
-    def initialize
-      app = Qt::Application.new(ARGV)
-      window = MainWindow::new
-      window.resize(Eiwaji::Constants::WINDOW_WIDTH, Eiwaji::Constants::WINDOW_HEIGHT)
-      window.show
-      app.exec
-    end
-  end
-end
+require "eiwaji/app"
+require "eiwaji/constants"
+require "eiwaji/dictionary_model"
+require "eiwaji/dictionary_widget"
+require "eiwaji/lexer_widget"
+require "eiwaji/mainwindow"
+require "eiwaji/settings_dialog"
+require "eiwaji/tableview"
+require "eiwaji/version"
+
+require "eiwaji/ui/ui_dictionary_dock"
+require "eiwaji/ui/ui_lexer"
+require "eiwaji/ui/ui_main_window"
+require "eiwaji/ui/ui_settings"

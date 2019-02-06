@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 require 've'
 
-require_relative 'ui/ui_lexer'
-
 module Eiwaji
   class LexerWidget < Qt::DockWidget
 
@@ -16,7 +14,7 @@ module Eiwaji
       super(parent)
 
       @parent = parent
-      
+
       @ui = Ui_LexerWidget.new
       @ui.setupUi(self)
 
@@ -81,7 +79,7 @@ module Eiwaji
       if append_to_history
         @ui.historyBox.setCurrentIndex(0)
         truncated_text = text.size < HISTORY_STRING_LENGTH ? text : text[0..HISTORY_STRING_LENGTH-1] + "..."
-        @ui.historyBox.insertItem(1, truncated_text, Qt::Variant.new(text)) 
+        @ui.historyBox.insertItem(1, truncated_text, Qt::Variant.new(text))
         @ui.historyBox.removeItem(MAX_HISTORY_ITEMS+1) if @ui.historyBox.count > MAX_HISTORY_ITEMS+1
       end
 
@@ -144,7 +142,7 @@ module Eiwaji
       # search on the query and sort by the results most similar to the lemma
       parent.search(query, lemma)
     end
-    
+
     # each symbol represents the class name of a Ve::PartOfSpeech
     def part_of_speech_colors
       @part_of_speech_colors ||= {
@@ -171,11 +169,30 @@ module Eiwaji
       raw = word.word
       pos = word.part_of_speech
       color = @part_of_speech_colors[pos.name.downcase.to_sym] || @part_of_speech_colors[:default]
-      
+
       if POS_IGNORE.include? pos
         raw = "<font style='color: #{color}'>" + raw + "</font>"
       else
         raw = "<a href=\'#{index}\' style='color: #{color}'>" + raw + "</a>"
+      end
+    end
+  end
+end
+
+
+# Hack since Ve will use `which` to locate mecab, but it isn't
+# available on Windows.
+class Ve
+  class Provider
+    class MecabIpadic < Ve::Provider
+      def initialize(config = {})
+        @config = {:app => 'mecab',
+                   :path => '',
+                   :flags => ''}.merge(config)
+
+        @config[:app] = "mecab"
+
+        start!
       end
     end
   end

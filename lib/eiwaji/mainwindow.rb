@@ -1,13 +1,8 @@
 # coding: utf-8
-require 'jdict'
+require 'ruby-jdict'
 require 'pp'
 require 'text'
 require 'mkmf'
-
-require_relative 'tableview'
-require_relative 'lexer_widget'
-require_relative 'dictionary_widget'
-require_relative 'settings_dialog'
 
 module Eiwaji
   class MainWindow < Qt::MainWindow
@@ -30,7 +25,6 @@ module Eiwaji
       if not File.exists? Eiwaji::Constants::CONFIG_PATH
         writeConfig
       end
-      readConfig
 
       initClipboard()
       createActions()
@@ -46,10 +40,11 @@ module Eiwaji
       clipboard = Qt::Application.clipboard
 
       # on Windows, it appears that the clipboard is not monitored until it is changed within the Qt application.
-      # clipboard.setText(clipboard.text.force_encoding("UTF-8")) if clipboard.mimeData.hasText
+      clipboard.setText(clipboard.text.force_encoding("UTF-8")) if clipboard.mimeData.hasText
+
       connect(clipboard, SIGNAL('changed(QClipboard::Mode)'), self, SLOT('clipboardChanged(QClipboard::Mode)'))
     end
-    
+
     # send the text in the main editor to the lexer widget
     def lexEditorText
       text = @ui.bigEditor.toPlainText
@@ -58,7 +53,7 @@ module Eiwaji
 
     def clipboardChanged(mode)
       clipboard = Qt::Application.clipboard
-      
+
       if clipboard.mimeData.hasText && mode == Qt::Clipboard::Clipboard && @clipboardCaptureAct.isChecked
         @ui.bigEditor.setText(clipboard.text.force_encoding("UTF-8"))
         lexEditorText()
@@ -71,7 +66,7 @@ module Eiwaji
       else
         @ui.bigEditor.setEnabled(true)
       end
-      
+
     end
 
     def search(query, lemma)
@@ -80,6 +75,7 @@ module Eiwaji
 
     def rebuild_dictionary
       @dictionary_widget.reset
+      @dictionary_widget.load_dictionary
     end
 
     def createStatusBar
@@ -133,29 +129,15 @@ module Eiwaji
     def openSettings
       settings = Eiwaji::SettingsDialog.new(self)
       settings.exec
-      readConfig
-      @dictionary_widget.reset
+      @dictionary_widget.load_dictionary
     end
 
     def writeConfig
-      config = JDict.configuration
-      @settings.setValue("num_results", Qt::Variant.new(config.num_results))
-      @settings.setValue("language", Qt::Variant.new(config.language.to_s))
+      @settings.setValue("num_results", Qt::Variant.new(50))
+      @settings.setValue("language", Qt::Variant.new(JDict::JMDictConstants::Languages::ENGLISH.to_s))
+      @settings.setValue("dictionary_path", Qt::Variant.new(Eiwaji::Constants::DICTIONARY_PATH))
       @settings.sync
     end
-
-    def readConfig
-      return unless File.exists? Eiwaji::Constants::CONFIG_PATH
-
-      JDict.reset
-      JDict.configure do |config|
-        config.num_results = @settings.value("num_results").toInt
-        config.language = @settings.value("language").toString.to_sym
-        config.dictionary_path = Eiwaji::Constants::DICTIONARY_PATH
-        config.index_path = Eiwaji::Constants::DICTIONARY_PATH
-      end
-    end
-    
   end
 end
 

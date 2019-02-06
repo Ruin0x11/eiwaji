@@ -28,10 +28,10 @@ Gem::Specification.new do |spec|
   # package in the JMDICT file for release version
   spec.require_paths << ("dicts") unless Eiwaji::DEBUG
 
-  spec.add_dependency 've', '~>0.0.3'
-  spec.add_dependency 'text', '~>1.3.1'
-  spec.add_dependency 'qtbindings', '~>4.8.6.2'
-  spec.add_dependency 'ruby-jdict', '~>0.0.3'
-  spec.add_development_dependency "bundler", "~> 1.10"
-  spec.add_development_dependency "rake", "~> 10.5.0"
+  spec.add_dependency 've', '0.0.3'
+  spec.add_dependency 'text', '~>1.3'
+  spec.add_dependency 'qtbindings', '~>4.8.6'
+  #spec.add_dependency 'ruby-jdict', '0.0.9'
+  spec.add_development_dependency "bundler", "~> 2.0"
+  spec.add_development_dependency "rake", "~> 12.3"
 end

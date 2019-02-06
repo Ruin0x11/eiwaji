@@ -1,7 +1,3 @@
-require 'jdict'
-
-require_relative 'ui/ui_settings'
-
 module Eiwaji
   class SettingsDialog < Qt::Dialog
     slots 'saveAndClose()', 'rebuildIndex()'
@@ -39,16 +35,15 @@ module Eiwaji
     end
 
     def loadSettings
-      config = JDict.configuration
       languages = JDict::JMDictConstants::Languages.constants.map {|l| languages_hash[JDict::JMDictConstants::Languages.const_get(l)]}.compact
       languages.each {|l| @ui.dictLanguageBox.addItem(l) }
-      index = @ui.dictLanguageBox.findText(languages_hash[JDict.configuration.language])
+      index = @ui.dictLanguageBox.findText(languages_hash[@settings.value("language").toString.to_sym])
       if index == -1
         index = @ui.dictLanguageBox.findText("English")
       end
       @ui.dictLanguageBox.currentIndex = index
 
-      @ui.maxResultsBox.value = JDict.configuration.num_results
+      @ui.maxResultsBox.value = @settings.value("num_results").toInt
     end
 
     def saveSettings
@@ -58,12 +53,6 @@ module Eiwaji
     end
 
     def rebuildIndex()
-      if File.exists? Eiwaji::Constants::INDEX_FILE
-        File.unlink(Eiwaji::Constants::INDEX_FILE)
-      end
-      Qt::MessageBox.information(self, tr("Rebuilding Index"),
-                                 tr("Please wait while the index is rebuilt."))
-
       @parent.rebuild_dictionary
 
       Qt::MessageBox.information(self, tr("Index Built"),
